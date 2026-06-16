@@ -1,0 +1,182 @@
+.screen {
+  min-height: 100vh;
+  background: #ffffff;
+  padding-bottom: 84px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 54px 20px 16px;
+}
+
+.appTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1b1b1f;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #b9b9c0;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Today banner */
+.todayBanner {
+  margin: 0 20px;
+  background: #ffe7df;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+}
+
+.todayIcon {
+  width: 40px;
+  height: 40px;
+  background: #ff5c39;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.todayText {
+  flex: 1;
+}
+
+.todayTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1b1b1f;
+}
+
+.todaySubtitle {
+  font-size: 13px;
+  font-weight: 400;
+  color: #8a8a93;
+  margin-top: 2px;
+}
+
+.todayArrow {
+  font-size: 20px;
+  color: #ff5c39;
+  font-weight: 600;
+}
+
+/* Section */
+.section {
+  padding: 24px 20px 0;
+}
+
+.sectionTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1b1b1f;
+  margin-bottom: 16px;
+}
+
+.loadingText,
+.emptyText {
+  font-size: 14px;
+  color: #8a8a93;
+}
+
+.seedLink {
+  background: none;
+  border: none;
+  color: #ff5c39;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.albumList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Album card */
+.albumCard {
+  border: 1px solid #ececec;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.thumbnailRow {
+  display: flex;
+  height: 128px;
+}
+
+.thumbnail {
+  flex: 1;
+}
+
+.albumInfo {
+  padding: 14px 16px;
+}
+
+.albumTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1b1b1f;
+}
+
+.albumDesc {
+  font-size: 13px;
+  font-weight: 400;
+  color: #8a8a93;
+  margin-top: 4px;
+}
+
+.progressTrack {
+  margin-top: 14px;
+  height: 6px;
+  background: #ececec;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: #ff5c39;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.albumMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.metaBold {
+  font-size: 13px;
+  font-weight: 500;
+  color: #1b1b1f;
+}
+
+.metaGray {
+  font-size: 13px;
+  font-weight: 400;
+  color: #8a8a93;
+}

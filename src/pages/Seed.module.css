@@ -1,0 +1,103 @@
+.rulesBox {
+  background: #faf7f2;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rulesTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1b1b1f;
+}
+
+.rulesText {
+  font-size: 13px;
+  color: #8a8a93;
+  line-height: 1.5;
+}
+
+.rulesToggle {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ff5c39;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.codeBlock {
+  position: relative;
+  margin-top: 8px;
+  background: #1b1b1f;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.code {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 11px;
+  color: #f0f0f0;
+  white-space: pre;
+  overflow-x: auto;
+  line-height: 1.7;
+}
+
+.copyBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #333;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.rulesNote {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #8a8a93;
+}
+
+.logBox {
+  background: #f7f7f7;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.logLine {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  color: #1b1b1f;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.logError {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  color: #e53935;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.logWarn {
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  color: #e67e22;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}

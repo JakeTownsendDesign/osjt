@@ -1,0 +1,389 @@
+.screen {
+  min-height: 100vh;
+  background: #ffffff;
+  padding-bottom: 100px;
+}
+
+.loadingText {
+  text-align: center;
+  padding: 80px 20px;
+  color: #8a8a93;
+  font-size: 15px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 56px 20px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.headerTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1b1b1f;
+}
+
+.saveBtn {
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #ff5c39;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 0;
+  opacity: 1;
+  transition: opacity 0.15s;
+}
+
+.saveBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Avatar */
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px 20px;
+}
+
+.avatarWrap {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  overflow: visible;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.avatarImg {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatarPlaceholder {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.avatarBadge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #1b1b1f;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.changePhotoLabel {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ff5c39;
+}
+
+/* Fields */
+.fields {
+  padding: 8px 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8a8a93;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input {
+  width: 100%;
+  height: 50px;
+  background: #f7f7f7;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 0 14px;
+  font-size: 15px;
+  font-weight: 400;
+  font-family: inherit;
+  color: #1b1b1f;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  border-color: #ff5c39;
+  background: #ffffff;
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.inputError {
+  border-color: #e53935 !important;
+}
+
+/* Username with @ prefix */
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.atSign {
+  position: absolute;
+  left: 14px;
+  font-size: 15px;
+  color: #8a8a93;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.inputWithAt {
+  width: 100%;
+  height: 50px;
+  background: #f7f7f7;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 0 40px 0 30px;
+  font-size: 15px;
+  font-weight: 400;
+  font-family: inherit;
+  color: #1b1b1f;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.inputWithAt:focus {
+  border-color: #ff5c39;
+  background: #ffffff;
+}
+
+.inputWithAt:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.statusIcon {
+  position: absolute;
+  right: 14px;
+  font-size: 14px;
+}
+
+.ok { color: #50c878; }
+.err { color: #e53935; }
+
+/* Textarea */
+.textarea {
+  width: 100%;
+  background: #f7f7f7;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 400;
+  font-family: inherit;
+  color: #1b1b1f;
+  outline: none;
+  resize: none;
+  line-height: 1.5;
+  transition: border-color 0.15s;
+}
+
+.textarea:focus {
+  border-color: #ff5c39;
+  background: #ffffff;
+}
+
+.charCount {
+  font-size: 11px;
+  color: #b9b9c0;
+  text-align: right;
+}
+
+/* Hints */
+.fieldHint {
+  font-size: 12px;
+  color: #8a8a93;
+}
+
+.fieldHintGreen {
+  font-size: 12px;
+  color: #50c878;
+  font-weight: 500;
+}
+
+.fieldError {
+  font-size: 12px;
+  color: #e53935;
+  font-weight: 500;
+}
+
+/* Save / errors */
+.saveError {
+  font-size: 13px;
+  color: #e53935;
+  font-weight: 500;
+}
+
+.saveSuccess {
+  font-size: 13px;
+  color: #50c878;
+  font-weight: 600;
+}
+
+.primaryButton {
+  width: 100%;
+  height: 52px;
+  background: #ff5c39;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.primaryButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.signOutLink {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #8a8a93;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  padding: 4px 0;
+}
+
+/* Albums grid */
+.albumsSection {
+  padding: 32px 20px 0;
+}
+
+.sectionTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1b1b1f;
+  margin-bottom: 16px;
+}
+
+.emptyAlbums {
+  font-size: 14px;
+  color: #b9b9c0;
+}
+
+.albumGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.albumTile {
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.tileThumbRow {
+  display: flex;
+  height: 80px;
+}
+
+.tileThumb {
+  flex: 1;
+}
+
+.tileTitle {
+  padding: 10px 10px 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1b1b1f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tileMeta {
+  padding: 0 10px 10px;
+  font-size: 11px;
+  color: #8a8a93;
+}
+
+/* Re-auth modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 20px 20px 0 0;
+  padding: 28px 24px 40px;
+  width: 100%;
+  max-width: 390px;
+}
+
+.modalTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1b1b1f;
+  margin-bottom: 6px;
+}
+
+.modalSub {
+  font-size: 14px;
+  color: #8a8a93;
+  margin-bottom: 20px;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
