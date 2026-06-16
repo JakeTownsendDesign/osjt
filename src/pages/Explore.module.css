@@ -1,0 +1,340 @@
+.screen {
+  min-height: 100vh;
+  background: #ffffff;
+  padding-bottom: 84px;
+}
+
+/* Header */
+.header {
+  padding: 54px 20px 0;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1b1b1f;
+}
+
+/* Tab bar */
+.tabBar {
+  position: relative;
+  display: flex;
+  margin: 16px 20px 0;
+  border-bottom: 1px solid #ececec;
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: #8a8a93;
+  padding: 10px 0 12px;
+  cursor: pointer;
+  transition: color 0.15s;
+  position: relative;
+  z-index: 1;
+}
+
+.tabActive {
+  color: #ff5c39;
+  font-weight: 600;
+}
+
+.tabIndicator {
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  background: #ff5c39;
+  border-radius: 2px;
+  transition: left 0.2s ease;
+}
+
+/* Shared */
+.content {
+  padding-top: 4px;
+}
+
+.loadingText {
+  text-align: center;
+  padding: 48px 20px;
+  font-size: 14px;
+  color: #8a8a93;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 40px;
+  gap: 8px;
+  text-align: center;
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1b1b1f;
+}
+
+.emptySubtitle {
+  font-size: 14px;
+  color: #8a8a93;
+}
+
+.emptyLink {
+  color: #ff5c39;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ── Popular ─────────────────────────────────────────────────────────────── */
+
+.popularList {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.popularCard {
+  border: 1px solid #ececec;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.rank {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ff5c39;
+  min-width: 24px;
+}
+
+.posterRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex: 1;
+}
+
+.posterAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.posterAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.posterUsername {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1b1b1f;
+}
+
+.thumbRow {
+  display: flex;
+  height: 110px;
+}
+
+.thumb {
+  flex: 1;
+}
+
+.cardBody {
+  padding: 12px 14px 14px;
+}
+
+.cardTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1b1b1f;
+}
+
+.cardDesc {
+  font-size: 13px;
+  color: #8a8a93;
+  margin-top: 3px;
+  margin-bottom: 12px;
+}
+
+.statsRow {
+  display: flex;
+  gap: 16px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.statIcon {
+  font-size: 12px;
+}
+
+.statValue {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1b1b1f;
+}
+
+.statLabel {
+  font-size: 11px;
+  color: #8a8a93;
+}
+
+/* ── People ──────────────────────────────────────────────────────────────── */
+
+.peopleList {
+  padding: 8px 20px;
+}
+
+.personRow {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f5f5f5;
+  gap: 12px;
+}
+
+.personRow:last-child {
+  border-bottom: none;
+}
+
+.personInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.personAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.personAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.personText {
+  min-width: 0;
+}
+
+.personName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1b1b1f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.personUsername {
+  font-size: 12px;
+  color: #8a8a93;
+  margin-top: 1px;
+}
+
+.personBio {
+  font-size: 12px;
+  color: #8a8a93;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.followBtn {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 20px;
+  border: 1.5px solid #ff5c39;
+  background: #ff5c39;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.followingBtn {
+  background: transparent;
+  color: #ff5c39;
+}
+
+.followBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── Places ──────────────────────────────────────────────────────────────── */
+
+.placesContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  text-align: center;
+  gap: 12px;
+}
+
+.placesIcon {
+  font-size: 56px;
+  margin-bottom: 8px;
+}
+
+.placesTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1b1b1f;
+}
+
+.placesSubtitle {
+  font-size: 15px;
+  color: #8a8a93;
+  line-height: 1.55;
+  max-width: 280px;
+}

@@ -18,27 +18,24 @@ const SEED_ALBUMS = [
     id: 'spain-2026',
     title: 'Spain Holidays 2026',
     description: 'Two weeks chasing sun, sea and sangria across the coast.',
-    maxPhotos: 100,
-    photoCount: 37,
-    contributorCount: 6,
+    maxPhotos: 100, photoCount: 37, contributorCount: 6,
+    likeCount: 142, commentCount: 38,
     thumbnailColors: ['#e8dccb', '#d9c7b0', '#cbb89e', '#e2d2bc'],
   },
   {
     id: 'sunday-coffee',
     title: 'Sunday Morning Coffee',
     description: 'One perfect cup, from wherever you are in the world.',
-    maxPhotos: 200,
-    photoCount: 82,
-    contributorCount: 23,
+    maxPhotos: 200, photoCount: 82, contributorCount: 23,
+    likeCount: 310, commentCount: 91,
     thumbnailColors: ['#c8d8e8', '#b0c4d9', '#9eb3cb', '#c2d0df'],
   },
   {
     id: 'golden-hour',
     title: 'Golden Hour',
     description: 'That magic light just before sunset.',
-    maxPhotos: 50,
-    photoCount: 12,
-    contributorCount: 4,
+    maxPhotos: 50, photoCount: 12, contributorCount: 4,
+    likeCount: 57, commentCount: 14,
     thumbnailColors: ['#f5e6c8', '#f0d9a8', '#e8c98a', '#f2ddb0'],
   },
 ]
@@ -177,8 +174,10 @@ export default function Seed() {
     for (const album of SEED_ALBUMS) {
       const { id, ...data } = album
       try {
+        const score = (data.photoCount * 3) + (data.likeCount * 2) + data.commentCount
         await setDoc(doc(db, 'albums', id), {
           ...data,
+          score,
           createdBy:  currentUser.uid,
           updatedAt:  serverTimestamp(),
         })
