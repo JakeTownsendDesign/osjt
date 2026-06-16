@@ -9,6 +9,7 @@ import Home from './pages/Home'
 import Explore from './pages/Explore'
 import Profile from './pages/Profile'
 import Seed from './pages/Seed'
+import UserProfile from './pages/UserProfile'
 
 // Logged in + email verified → allow through
 // Logged in + unverified → send to /verify-email
@@ -55,6 +56,7 @@ export default function App() {
         <Route path="/explore"      element={<ProtectedRoute user={user}><Explore /></ProtectedRoute>} />
         <Route path="/profile"      element={<ProtectedRoute user={user}><Profile /></ProtectedRoute>} />
         <Route path="/seed"         element={<ProtectedRoute user={user}><Seed /></ProtectedRoute>} />
+        <Route path="/users/:uid"   element={<ProtectedRoute user={user}><UserProfile /></ProtectedRoute>} />
         <Route path="*"             element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
