@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
-import BottomNav from '../components/BottomNav'
 import styles from './UserProfile.module.css'
 
 export default function UserProfile() {
@@ -35,7 +34,6 @@ export default function UserProfile() {
     return (
       <div className={styles.screen}>
         <p className={styles.loadingText}>Loading…</p>
-        <BottomNav />
       </div>
     )
   }
@@ -45,7 +43,6 @@ export default function UserProfile() {
       <div className={styles.screen}>
         <button className={styles.backBtn} onClick={() => navigate(-1)}>‹ Back</button>
         <p className={styles.notFound}>User not found.</p>
-        <BottomNav />
       </div>
     )
   }
@@ -86,7 +83,6 @@ export default function UserProfile() {
         }
       </div>
 
-      <BottomNav />
     </div>
   )
 }

@@ -11,6 +11,7 @@ import Profile from './pages/Profile'
 import Seed from './pages/Seed'
 import UserProfile from './pages/UserProfile'
 import CreateAlbum from './pages/CreateAlbum'
+import AppLayout from './components/AppLayout'
 
 // Logged in + email verified → allow through
 // Logged in + unverified → send to /verify-email
@@ -53,12 +54,12 @@ export default function App() {
         <Route path="/signup"       element={<AuthRoute user={user}><SignUp /></AuthRoute>} />
         <Route path="/login"        element={<AuthRoute user={user}><Login /></AuthRoute>} />
         <Route path="/verify-email" element={<LoggedInRoute user={user}><VerifyEmail /></LoggedInRoute>} />
-        <Route path="/"             element={<ProtectedRoute user={user}><Home /></ProtectedRoute>} />
-        <Route path="/explore"      element={<ProtectedRoute user={user}><Explore /></ProtectedRoute>} />
-        <Route path="/profile"      element={<ProtectedRoute user={user}><Profile /></ProtectedRoute>} />
-        <Route path="/seed"         element={<ProtectedRoute user={user}><Seed /></ProtectedRoute>} />
-        <Route path="/users/:uid"      element={<ProtectedRoute user={user}><UserProfile /></ProtectedRoute>} />
-        <Route path="/create-album"   element={<ProtectedRoute user={user}><CreateAlbum /></ProtectedRoute>} />
+        <Route path="/"             element={<ProtectedRoute user={user}><AppLayout><Home /></AppLayout></ProtectedRoute>} />
+        <Route path="/explore"      element={<ProtectedRoute user={user}><AppLayout><Explore /></AppLayout></ProtectedRoute>} />
+        <Route path="/profile"      element={<ProtectedRoute user={user}><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
+        <Route path="/seed"         element={<ProtectedRoute user={user}><AppLayout><Seed /></AppLayout></ProtectedRoute>} />
+        <Route path="/users/:uid"   element={<ProtectedRoute user={user}><AppLayout><UserProfile /></AppLayout></ProtectedRoute>} />
+        <Route path="/create-album" element={<ProtectedRoute user={user}><CreateAlbum /></ProtectedRoute>} />
         <Route path="*"             element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

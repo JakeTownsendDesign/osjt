@@ -5,7 +5,6 @@ import {
 } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import { Link } from 'react-router-dom'
-import BottomNav from '../components/BottomNav'
 import styles from './Explore.module.css'
 
 const TABS = ['Popular', 'People', 'Places']
@@ -43,7 +42,6 @@ export default function Explore() {
         {activeTab === 'Places'  && <PlacesTab />}
       </div>
 
-      <BottomNav />
     </div>
   )
 }

@@ -1,0 +1,30 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  /* Room for bottom nav on mobile */
+  padding-bottom: 84px;
+}
+
+/* Tablet+ — sidebar takes over from bottom nav */
+@media (min-width: 768px) {
+  .main {
+    padding-bottom: 0;
+    /* Sidebar is 72px wide on tablet */
+    margin-left: 72px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .main {
+    /* Sidebar is 220px wide on desktop */
+    margin-left: 220px;
+    /* Cap content width and center it */
+    max-width: calc(860px + 220px);
+  }
+}

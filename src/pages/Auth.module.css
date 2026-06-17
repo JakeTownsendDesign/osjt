@@ -162,3 +162,26 @@
   font-weight: 600;
   text-decoration: none;
 }
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (min-width: 640px) {
+  .screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: #faf7f2;
+  }
+
+  .screen > *,
+  .form {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .logo {
+    margin-bottom: 20px;
+  }
+}

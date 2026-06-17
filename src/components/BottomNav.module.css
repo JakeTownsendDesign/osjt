@@ -1,10 +1,8 @@
 .nav {
   position: fixed;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 450px;
+  left: 0;
+  right: 0;
   height: 84px;
   background: #ffffff;
   border-top: 1px solid #ececec;
@@ -13,6 +11,13 @@
   justify-content: space-around;
   padding: 0 8px;
   z-index: 100;
+}
+
+/* Hide on tablet+ — SideNav takes over */
+@media (min-width: 768px) {
+  .nav {
+    display: none;
+  }
 }
 
 .tab {

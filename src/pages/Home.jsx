@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { collection, query, orderBy, limit, getDocs, doc, getDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import { useNavigate, Link } from 'react-router-dom'
-import BottomNav from '../components/BottomNav'
 import styles from './Home.module.css'
 
 export default function Home() {
@@ -84,7 +83,6 @@ export default function Home() {
         </div>
       </section>
 
-      <BottomNav />
     </div>
   )
 }

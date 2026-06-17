@@ -11,7 +11,6 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { auth, db, storage } from '../firebase'
 import { signOut } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
-import BottomNav from '../components/BottomNav'
 import styles from './Profile.module.css'
 
 // ─── Username helpers ────────────────────────────────────────────────────────
@@ -257,7 +256,6 @@ export default function Profile() {
     return (
       <div className={styles.screen}>
         <p className={styles.loadingText}>Loading…</p>
-        <BottomNav />
       </div>
     )
   }
@@ -419,7 +417,6 @@ export default function Profile() {
         </div>
       )}
 
-      <BottomNav />
     </div>
   )
 }

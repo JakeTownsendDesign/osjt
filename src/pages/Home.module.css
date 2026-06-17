@@ -1,7 +1,7 @@
 .screen {
   min-height: 100vh;
   background: #ffffff;
-  padding-bottom: 84px;
+  
 }
 
 .header {
@@ -221,4 +221,34 @@
   font-size: 13px;
   font-weight: 400;
   color: #8a8a93;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .header {
+    padding: 32px 32px 16px;
+  }
+  .todayBanner {
+    margin: 0 32px;
+  }
+  .section {
+    padding: 24px 32px 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .header {
+    padding: 40px 48px 20px;
+  }
+  .todayBanner {
+    margin: 0 48px;
+  }
+  .section {
+    padding: 28px 48px 0;
+  }
+  .albumList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
 }
