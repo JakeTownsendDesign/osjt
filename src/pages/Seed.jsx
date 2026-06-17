@@ -5,6 +5,9 @@ import { Link } from 'react-router-dom'
 import styles from './Auth.module.css'
 import seedStyles from './Seed.module.css'
 
+// ─── Picsum helper ─────────────────────────────────────────────────────────
+const img = (seed) => `https://picsum.photos/seed/${seed}/600/600`
+
 const SEED_USERS = [
   { id: 'user-alice', displayName: 'Alice Johnson', username: 'alice',   avatarColor: '#f6339a', bio: 'Lover of golden hour and espresso.' },
   { id: 'user-bob',   displayName: 'Bob Smith',     username: 'bobsmith', avatarColor: '#4a90d9', bio: 'Street photographer based in London.' },
@@ -13,32 +16,162 @@ const SEED_USERS = [
   { id: 'user-emma',  displayName: 'Emma Davis',    username: 'emmad',    avatarColor: '#e67e22', bio: 'Coffee, cameras, and coastlines.' },
 ]
 
+// Albums: 3 owned by logged-in user, 3 owned by seed users
 const SEED_ALBUMS = [
+  // ── Owned by logged-in user ──────────────────────────────────────────────
   {
-    id: 'spain-2026',
+    id: 'spain-2026', owner: 'self',
     title: 'Spain Holidays 2026',
     description: 'Two weeks chasing sun, sea and sangria across the coast.',
-    maxPhotos: 100, photoCount: 37, contributorCount: 6,
-    likeCount: 142, commentCount: 38,
+    maxPhotos: 100, photoCount: 9, contributorCount: 6,
+    likeCount: 142, commentCount: 4,
     thumbnailColors: ['#e8dccb', '#d9c7b0', '#cbb89e', '#e2d2bc'],
+    posts: [
+      { seed: 'spain-beach',  caption: 'The coast just hits different in June 🌊', by: 'self',       likes: 24 },
+      { seed: 'spain-market', caption: 'Mercado vibes all morning ☀️',             by: 'user-alice', likes: 18 },
+      { seed: 'spain-arch',   caption: 'Gaudi never misses.',                       by: 'user-bob',   likes: 31 },
+      { seed: 'spain-food',   caption: 'Tapas for breakfast, tapas for dinner 🍢',  by: 'user-carol', likes: 14 },
+      { seed: 'spain-port',   caption: 'Harbour at dusk — unreal colours.',         by: 'user-dave',  likes: 22 },
+      { seed: 'spain-tiles',  caption: 'The tilework in this city is obsessive.',   by: 'user-emma',  likes: 9  },
+      { seed: 'spain-sea',    caption: 'Jumped in. Worth it.',                      by: 'self',       likes: 37 },
+      { seed: 'spain-bar',    caption: 'This sangria kept us there until 2am.',     by: 'user-alice', likes: 11 },
+      { seed: 'spain-roof',   caption: 'Rooftop views > everything.',               by: 'user-bob',   likes: 28 },
+    ],
   },
   {
-    id: 'sunday-coffee',
+    id: 'sunday-coffee', owner: 'self',
     title: 'Sunday Morning Coffee',
     description: 'One perfect cup, from wherever you are in the world.',
-    maxPhotos: 200, photoCount: 82, contributorCount: 23,
-    likeCount: 310, commentCount: 91,
+    maxPhotos: 200, photoCount: 9, contributorCount: 5,
+    likeCount: 310, commentCount: 3,
     thumbnailColors: ['#c8d8e8', '#b0c4d9', '#9eb3cb', '#c2d0df'],
+    posts: [
+      { seed: 'coffee-flat',   caption: 'Flat white in Edinburgh. Cold outside, warm inside ☕', by: 'self',       likes: 44 },
+      { seed: 'coffee-pour',   caption: 'Pour over, no milk, no sugar, no regrets.',              by: 'user-alice', likes: 19 },
+      { seed: 'coffee-window', caption: 'Rainy window + cortado = Sunday done right.',            by: 'user-carol', likes: 33 },
+      { seed: 'coffee-beans',  caption: 'Ethiopian Yirgacheffe. The smell alone 😤',              by: 'user-emma',  likes: 27 },
+      { seed: 'coffee-paris',  caption: 'A café in Montmartre. Took two sips and felt French.',  by: 'user-bob',   likes: 51 },
+      { seed: 'coffee-cup',    caption: 'Tiny espresso, massive morning energy.',                  by: 'user-dave',  likes: 16 },
+      { seed: 'coffee-latte',  caption: 'Latte art attempt number 47. Getting there.',            by: 'self',       likes: 38 },
+      { seed: 'coffee-market2',caption: 'Found this gem in a side street in Lisbon.',             by: 'user-carol', likes: 22 },
+      { seed: 'coffee-cold',   caption: 'Cold brew at the beach. Summer perfection.',             by: 'user-alice', likes: 29 },
+    ],
   },
   {
-    id: 'golden-hour',
+    id: 'golden-hour', owner: 'self',
     title: 'Golden Hour',
     description: 'That magic light just before sunset.',
-    maxPhotos: 50, photoCount: 12, contributorCount: 4,
-    likeCount: 57, commentCount: 14,
+    maxPhotos: 50, photoCount: 6, contributorCount: 4,
+    likeCount: 57, commentCount: 2,
     thumbnailColors: ['#f5e6c8', '#f0d9a8', '#e8c98a', '#f2ddb0'],
+    posts: [
+      { seed: 'golden-lake',    caption: 'The lake reflected everything. I nearly cried.',          by: 'self',       likes: 41 },
+      { seed: 'golden-fields',  caption: 'Wheat fields at 7pm. Two minutes of perfect light.',     by: 'user-carol', likes: 33 },
+      { seed: 'golden-rooftop', caption: 'Rooftop, good company, better light.',                   by: 'user-alice', likes: 28 },
+      { seed: 'golden-coast',   caption: 'The sea turns to fire. This is why I shoot.',            by: 'user-dave',  likes: 19 },
+      { seed: 'golden-silh',    caption: 'Silhouette game strong 🌅',                              by: 'user-bob',   likes: 45 },
+      { seed: 'golden-forest',  caption: 'Trees filtering the last sun of the day.',               by: 'self',       likes: 22 },
+    ],
+  },
+
+  // ── Owned by seed users ──────────────────────────────────────────────────
+  {
+    id: 'album-alice-berlin', owner: 'user-alice',
+    title: 'Rainy Days in Berlin',
+    description: 'Grey skies, cobblestones and the best coffee I have ever had.',
+    maxPhotos: 60, photoCount: 7, contributorCount: 3,
+    likeCount: 88, commentCount: 3,
+    thumbnailColors: ['#c8cdd6', '#b5bbc8', '#a0a8bc', '#cdd1db'],
+    posts: [
+      { seed: 'berlin-street',  caption: 'Mitte in the rain. Empty streets, full heart.',          by: 'user-alice', likes: 17 },
+      { seed: 'berlin-cafe',    caption: 'Found a record shop with a coffee bar inside. Peak.',    by: 'user-bob',   likes: 29 },
+      { seed: 'berlin-wall',    caption: 'The Wall. Still heavy, still important.',                by: 'user-alice', likes: 38 },
+      { seed: 'berlin-market2', caption: 'Sunday market. Bought two prints and a bratwurst.',     by: 'user-carol', likes: 14 },
+      { seed: 'berlin-bahn',    caption: 'U-Bahn platform at rush hour. Great light weirdly.',    by: 'user-alice', likes: 22 },
+      { seed: 'berlin-park',    caption: 'Tiergarten after the rain cleared. So quiet.',          by: 'user-bob',   likes: 11 },
+      { seed: 'berlin-night',   caption: 'Berlin really starts at midnight.',                      by: 'user-alice', likes: 33 },
+    ],
+  },
+  {
+    id: 'album-bob-streetfood', owner: 'user-bob',
+    title: 'Street Food Asia',
+    description: 'Every meal eaten standing up at a stall. No regrets.',
+    maxPhotos: 100, photoCount: 8, contributorCount: 4,
+    likeCount: 214, commentCount: 4,
+    thumbnailColors: ['#e8c8a0', '#d4b080', '#c09860', '#dcc090'],
+    posts: [
+      { seed: 'asia-noodles',  caption: 'Bowl of ramen that changed me. Bangkok, 6am.',          by: 'user-bob',   likes: 52 },
+      { seed: 'asia-market',   caption: 'Night market energy is unmatched.',                      by: 'user-emma',  likes: 38 },
+      { seed: 'asia-dumplings',caption: 'Dumplings in a paper bag. Burned my fingers. Ate them.', by: 'user-dave',  likes: 29 },
+      { seed: 'asia-grill',    caption: 'Satay smoke, street lights, strangers. Perfect evening.', by: 'user-bob',  likes: 44 },
+      { seed: 'asia-temple',   caption: 'Found this temple down an alley between two food stalls.',by: 'user-alice', likes: 21 },
+      { seed: 'asia-fruit',    caption: 'Mango sticky rice from a lady on a bicycle. Life goals.', by: 'user-bob',  likes: 61 },
+      { seed: 'asia-broth',    caption: 'Pho at sunrise. Best meal of the trip, easily.',         by: 'user-carol', likes: 33 },
+      { seed: 'asia-vendor',   caption: 'She has been at this spot for 30 years. Legend.',        by: 'user-bob',   likes: 47 },
+    ],
+  },
+  {
+    id: 'album-carol-swim', owner: 'user-carol',
+    title: 'Wild Swimming',
+    description: 'Cold water, no wetsuits, zero hesitation.',
+    maxPhotos: 40, photoCount: 6, contributorCount: 3,
+    likeCount: 73, commentCount: 3,
+    thumbnailColors: ['#a8d4e8', '#88bcd8', '#68a8cc', '#98c8e0'],
+    posts: [
+      { seed: 'swim-lake',    caption: 'Loch Lomond at 7am. 9°C. Screamed. Stayed in.',          by: 'user-carol', likes: 34 },
+      { seed: 'swim-river',   caption: 'River Dart after a hike down. The cold hit different.',  by: 'user-alice', likes: 19 },
+      { seed: 'swim-pool',    caption: 'Limestone pools in the Dordogne. Turquoise and freezing.', by: 'user-carol', likes: 28 },
+      { seed: 'swim-sea',     caption: 'January sea swim. I am fine. This is fine.',              by: 'user-dave',  likes: 41 },
+      { seed: 'swim-waterfall',caption: 'Waterfall plunge pool. Did not regret a single second.', by: 'user-carol', likes: 22 },
+      { seed: 'swim-morning', caption: 'Dawn swim. The world before anyone else is awake.',       by: 'user-alice', likes: 15 },
+    ],
   },
 ]
+
+// Comments keyed by album ID
+const SEED_COMMENTS_BY_ALBUM = {
+  'spain-2026': [
+    { id: 'cmt-spain-1', parentId: null,          by: 'user-alice', text: 'This album is giving me serious holiday envy 😍 When are you going back?', likes: 8 },
+    { id: 'cmt-spain-2', parentId: null,          by: 'user-bob',   text: 'The lighting in these shots is incredible. What time of day were most taken?', likes: 5 },
+    { id: 'cmt-spain-3', parentId: null,          by: 'user-carol', text: 'Sangria on a rooftop is my love language. Great album theme 🍊', likes: 12 },
+    { id: 'cmt-spain-4', parentId: null,          by: 'self',       text: 'Keep the photos coming everyone — only 91 slots left!', likes: 3 },
+    { id: 'cmt-spain-1r1', parentId: 'cmt-spain-1', by: 'user-dave', text: 'Same! Already looking at flights for next summer 🛫', likes: 2 },
+    { id: 'cmt-spain-1r2', parentId: 'cmt-spain-1', by: 'user-emma', text: 'The south coast in April is magic. Highly recommend!', likes: 4 },
+    { id: 'cmt-spain-2r1', parentId: 'cmt-spain-2', by: 'user-alice', text: 'Golden hour mostly — around 6–7pm. Makes everything look like a painting.', likes: 6 },
+  ],
+  'sunday-coffee': [
+    { id: 'cmt-coffee-1', parentId: null,           by: 'user-emma',  text: 'My favourite album on here. There is something so calming about a great cup in a new place ☕', likes: 19 },
+    { id: 'cmt-coffee-2', parentId: null,           by: 'user-carol', text: 'Mine was a cortado in Lisbon. Submitting mine tomorrow!', likes: 7 },
+    { id: 'cmt-coffee-3', parentId: null,           by: 'user-alice', text: 'The variety here is wild. Flat whites, pour-overs, Greek frappes... love it all.', likes: 11 },
+    { id: 'cmt-coffee-1r1', parentId: 'cmt-coffee-1', by: 'user-bob',  text: 'Completely agree. This is the most peaceful scroll on the internet.', likes: 5 },
+    { id: 'cmt-coffee-2r1', parentId: 'cmt-coffee-2', by: 'user-emma', text: 'Oh a Lisbon cortado sounds incredible, can\'t wait to see it!', likes: 3 },
+  ],
+  'golden-hour': [
+    { id: 'cmt-golden-1', parentId: null,            by: 'user-bob',   text: 'Only a few photos in and this is already one of the best albums here. That warm glow is everything.', likes: 9 },
+    { id: 'cmt-golden-2', parentId: null,            by: 'user-dave',  text: 'Chasing golden hour is a sport and I am here for it 🌇', likes: 6 },
+    { id: 'cmt-golden-1r1', parentId: 'cmt-golden-1', by: 'user-carol', text: 'The one I\'m submitting tomorrow was taken at a lake — the reflection doubled the glow 🤩', likes: 4 },
+  ],
+  'album-alice-berlin': [
+    { id: 'cmt-berlin-1', parentId: null,             by: 'user-emma',  text: 'Berlin in the rain is an entirely different city. Love this so much.', likes: 14 },
+    { id: 'cmt-berlin-2', parentId: null,             by: 'user-dave',  text: 'That record shop coffee bar — name?? Asking for myself immediately.', likes: 9 },
+    { id: 'cmt-berlin-3', parentId: null,             by: 'self',       text: 'The Wall photo genuinely stopped me scrolling. Powerful.', likes: 21 },
+    { id: 'cmt-berlin-2r1', parentId: 'cmt-berlin-2', by: 'user-alice', text: 'It\'s on Torstraße — tiny green door. You have to know it\'s there!', likes: 7 },
+  ],
+  'album-bob-streetfood': [
+    { id: 'cmt-food-1', parentId: null,           by: 'user-carol', text: 'I can almost smell these photos. Incredible album.', likes: 23 },
+    { id: 'cmt-food-2', parentId: null,           by: 'user-alice', text: 'The mango sticky rice one 😭 I need to go back to Thailand immediately.', likes: 31 },
+    { id: 'cmt-food-3', parentId: null,           by: 'self',       text: 'The vendor portrait is genuinely special. Did you get her name?', likes: 18 },
+    { id: 'cmt-food-4', parentId: null,           by: 'user-dave',  text: 'Ramen at 6am is the correct choice. Every time.', likes: 12 },
+    { id: 'cmt-food-1r1', parentId: 'cmt-food-1', by: 'user-bob',   text: 'Ha! The smells were unreal. My clothes told the story for days.', likes: 8 },
+    { id: 'cmt-food-3r1', parentId: 'cmt-food-3', by: 'user-bob',   text: 'Her name is Mae. Been at that spot 32 years. Absolute legend.', likes: 19 },
+  ],
+  'album-carol-swim': [
+    { id: 'cmt-swim-1', parentId: null,           by: 'user-emma',  text: 'Wild swimming is the most alive I ever feel. This album is everything.', likes: 16 },
+    { id: 'cmt-swim-2', parentId: null,           by: 'user-bob',   text: 'January sea swim 🥶 You are a braver person than me.', likes: 22 },
+    { id: 'cmt-swim-3', parentId: null,           by: 'self',       text: 'That Loch Lomond shot at 7am makes me want to book a trip immediately.', likes: 11 },
+    { id: 'cmt-swim-2r1', parentId: 'cmt-swim-2', by: 'user-carol', text: 'The cold is the whole point!! Come next January, I dare you 😂', likes: 9 },
+  ],
+}
 
 const RULES_SNIPPET = `rules_version = '2';
 service cloud.firestore {
@@ -169,110 +302,77 @@ export default function Seed() {
       hasError = true
     }
 
-    // ── 3. Seed albums (owned by current user so they show on your profile) ─
+    // ── 3. Seed albums ────────────────────────────────────────────────────────
     addLog('Seeding albums…')
     for (const album of SEED_ALBUMS) {
-      const { id, ...data } = album
+      const createdBy = album.owner === 'self' ? currentUser.uid : album.owner
+      const { id, owner, posts: _posts, ...data } = album
       try {
         const score = (data.photoCount * 3) + (data.likeCount * 2) + data.commentCount
         await setDoc(doc(db, 'albums', id), {
           ...data,
           score,
-          createdBy:  currentUser.uid,
-          createdAt:  serverTimestamp(),
-          updatedAt:  serverTimestamp(),
+          createdBy,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         })
-        addLog(`  ✓ ${album.title}`)
+        addLog(`  ✓ "${album.title}" → ${createdBy === currentUser.uid ? 'you' : createdBy}`)
       } catch (err) {
         addLog(`  ✗ ${album.title}: ${err.code || err.message}`, 'error')
         hasError = true
       }
     }
 
-    // ── 4. Seed posts ──────────────────────────────────────────────────────
+    // ── 4. Seed posts (with real images) ──────────────────────────────────
     addLog('Seeding posts…')
-    const CONTRIBUTORS = ['user-alice', 'user-bob', 'user-carol', 'user-dave', 'user-emma', currentUser.uid]
-    const POST_COLORS = {
-      'spain-2026':    ['#e8dccb','#d9c7b0','#cbb89e','#e2d2bc','#e5d6c0','#dcc9ae','#d0bca0','#cfc0a8','#dbcdb4'],
-      'sunday-coffee': ['#c8d8e8','#b0c4d9','#9eb3cb','#c2d0df','#b8cfe4','#a4bdd5','#d0dcea','#bccde2','#a8bcd8'],
-      'golden-hour':   ['#f5e6c8','#f0d9a8','#e8c98a','#f2ddb0','#eddaa6','#e8ce94','#f0d8a0','#eacf98','#e5c88c'],
-    }
-    const CAPTIONS = [
-      'Golden light hitting just right ✨', 'Can\'t stop thinking about this view 🌊',
-      'Perfect afternoon 🌅', 'This one surprised me 📸', 'Had to share this 🔥',
-      'Worth the early wake up', 'One of those moments', 'My favourite shot so far',
-      'The light was unreal today',
-    ]
-    const albumIds = ['spain-2026', 'sunday-coffee', 'golden-hour']
-    let postIndex = 0
-    for (const albumId of albumIds) {
-      const colors = POST_COLORS[albumId]
-      for (let i = 0; i < colors.length; i++) {
-        const postId = `post-${albumId}-${i}`
-        const contributorId = CONTRIBUTORS[i % CONTRIBUTORS.length]
+    let totalPosts = 0
+    for (const album of SEED_ALBUMS) {
+      for (let i = 0; i < album.posts.length; i++) {
+        const p = album.posts[i]
+        const postId = `post-${album.id}-${i}`
+        const createdBy = p.by === 'self' ? currentUser.uid : p.by
         try {
           await setDoc(doc(db, 'posts', postId), {
-            albumId,
-            createdBy: contributorId,
-            imageURL: null,
-            placeholderColor: colors[i],
-            caption: CAPTIONS[postIndex % CAPTIONS.length],
-            likeCount: Math.floor(Math.random() * 30),
+            albumId: album.id,
+            createdBy,
+            imageURL: img(p.seed),
+            placeholderColor: album.thumbnailColors[i % album.thumbnailColors.length],
+            caption: p.caption,
+            likeCount: p.likes,
             createdAt: serverTimestamp(),
           })
-          postIndex++
+          totalPosts++
         } catch (err) {
           addLog(`  ✗ post ${postId}: ${err.code || err.message}`, 'error')
           hasError = true
         }
       }
-      addLog(`  ✓ ${colors.length} posts for ${albumId}`)
+      addLog(`  ✓ ${album.posts.length} posts for "${album.title}"`)
     }
 
-    // ── 5. Seed comments (with replies) ───────────────────────────────────
+    // ── 5. Seed comments ─────────────────────────────────────────────────────
     addLog('Seeding comments…')
-
-    const SEED_COMMENTS = [
-      // spain-2026 top-level
-      { id: 'comment-spain-1', albumId: 'spain-2026', parentId: null, createdBy: 'user-alice', text: 'This album is giving me serious holiday envy 😍 When are you going back?', likeCount: 8 },
-      { id: 'comment-spain-2', albumId: 'spain-2026', parentId: null, createdBy: 'user-bob',   text: 'The lighting in these shots is incredible. What time of day were most of these taken?', likeCount: 5 },
-      { id: 'comment-spain-3', albumId: 'spain-2026', parentId: null, createdBy: 'user-carol', text: 'Sangria on a rooftop is my love language. Great album theme 🍊', likeCount: 12 },
-      { id: 'comment-spain-4', albumId: 'spain-2026', parentId: null, createdBy: currentUser.uid, text: 'Keep the photos coming everyone — only 63 slots left!', likeCount: 3 },
-      // spain-2026 replies
-      { id: 'comment-spain-1-reply-1', albumId: 'spain-2026', parentId: 'comment-spain-1', createdBy: 'user-dave', text: 'Same! Already looking at flights for next summer 🛫', likeCount: 2 },
-      { id: 'comment-spain-1-reply-2', albumId: 'spain-2026', parentId: 'comment-spain-1', createdBy: 'user-emma', text: 'The south coast in April is magic. Highly recommend!', likeCount: 4 },
-      { id: 'comment-spain-2-reply-1', albumId: 'spain-2026', parentId: 'comment-spain-2', createdBy: 'user-alice', text: 'Golden hour mostly — around 6–7pm. Makes everything look like a painting.', likeCount: 6 },
-
-      // sunday-coffee top-level
-      { id: 'comment-coffee-1', albumId: 'sunday-coffee', parentId: null, createdBy: 'user-emma', text: 'This is my favourite album on here. There is something so calming about a good cup of coffee in a new place ☕', likeCount: 19 },
-      { id: 'comment-coffee-2', albumId: 'sunday-coffee', parentId: null, createdBy: 'user-carol', text: 'Mine was a cortado in a tiny place in Lisbon. Submitting mine tomorrow!', likeCount: 7 },
-      { id: 'comment-coffee-3', albumId: 'sunday-coffee', parentId: null, createdBy: 'user-alice', text: 'The variety here is wild. Flat whites, pour-overs, Greek frappes... love it all.', likeCount: 11 },
-      // sunday-coffee replies
-      { id: 'comment-coffee-1-reply-1', albumId: 'sunday-coffee', parentId: 'comment-coffee-1', createdBy: 'user-bob',  text: 'Completely agree. This is the most peaceful scroll on the internet.', likeCount: 5 },
-      { id: 'comment-coffee-2-reply-1', albumId: 'sunday-coffee', parentId: 'comment-coffee-2', createdBy: 'user-emma', text: 'Oh a Lisbon cortado sounds incredible, can\'t wait to see it!', likeCount: 3 },
-
-      // golden-hour top-level
-      { id: 'comment-golden-1', albumId: 'golden-hour', parentId: null, createdBy: 'user-bob',   text: 'Only 12 photos in and this is already one of the best albums I\'ve seen. That warm glow is everything.', likeCount: 9 },
-      { id: 'comment-golden-2', albumId: 'golden-hour', parentId: null, createdBy: 'user-dave',  text: 'Chasing golden hour is a sport and I am here for it 🌇', likeCount: 6 },
-      // golden-hour reply
-      { id: 'comment-golden-1-reply-1', albumId: 'golden-hour', parentId: 'comment-golden-1', createdBy: 'user-carol', text: 'The one I\'m submitting tomorrow was taken at a lake — the reflection doubled the glow 🤩', likeCount: 4 },
-    ]
-
-    let commentCount = 0
-    for (const comment of SEED_COMMENTS) {
-      const { id, ...data } = comment
-      try {
-        await setDoc(doc(db, 'comments', id), {
-          ...data,
-          createdAt: serverTimestamp(),
-        })
-        commentCount++
-      } catch (err) {
-        addLog(`  ✗ ${id}: ${err.code || err.message}`, 'error')
-        hasError = true
+    let totalComments = 0
+    for (const [albumId, comments] of Object.entries(SEED_COMMENTS_BY_ALBUM)) {
+      for (const c of comments) {
+        const { id, by, likes, ...rest } = c
+        const createdBy = by === 'self' ? currentUser.uid : by
+        try {
+          await setDoc(doc(db, 'comments', id), {
+            ...rest,
+            albumId,
+            createdBy,
+            likeCount: likes,
+            createdAt: serverTimestamp(),
+          })
+          totalComments++
+        } catch (err) {
+          addLog(`  ✗ ${id}: ${err.code || err.message}`, 'error')
+          hasError = true
+        }
       }
+      addLog(`  ✓ ${comments.length} comments for "${albumId}"`)
     }
-    if (commentCount > 0) addLog(`  ✓ ${commentCount} comments across 3 albums`)
 
     if (hasError) {
       addLog('⚠️  Some writes failed — see errors above. Likely a Firestore rules issue.', 'warn')
