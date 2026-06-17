@@ -31,6 +31,19 @@ export default function AlbumView() {
   // Post options
   const [activePost, setActivePost] = useState(null) // post being actioned
 
+  // Expanded photo (id of the post shown at 3x3)
+  const [expandedId, setExpandedId] = useState(null)
+
+  function toggleExpand(id) {
+    const run = () => setExpandedId((prev) => (prev === id ? null : id))
+    // Smooth grid reflow via the View Transitions API where supported
+    if (document.startViewTransition) {
+      document.startViewTransition(run)
+    } else {
+      run()
+    }
+  }
+
   const isCreator = album?.createdBy === user?.uid
 
   // ── Load ──
@@ -261,6 +274,8 @@ export default function AlbumView() {
             poster={contributors[post.createdBy]}
             isLiked={likedPostIds.has(post.id)}
             isCreator={isCreator}
+            expanded={expandedId === post.id}
+            onToggleExpand={() => toggleExpand(post.id)}
             onLike={() => toggleLike(post)}
             onOptions={() => setActivePost(post)}
           />
@@ -347,25 +362,64 @@ export default function AlbumView() {
 }
 
 // ── Photo tile ──
-function PhotoTile({ post, poster, isLiked, isCreator, onLike, onOptions }) {
+function PhotoTile({ post, poster, isLiked, isCreator, expanded, onToggleExpand, onLike, onOptions }) {
+  const initials = poster?.displayName
+    ? poster.displayName.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
+    : '?'
+
   return (
-    <div className={styles.tile}>
-      {post.imageURL
-        ? <img src={post.imageURL} alt={post.caption || ''} className={styles.tileImg} />
-        : <div className={styles.tilePlaceholder} style={{ background: post.placeholderColor || '#e8dccb' }} />
-      }
-      <div className={styles.tileOverlay}>
-        <button className={styles.tileMenuBtn} onClick={onOptions} aria-label="Options">···</button>
-        <button
-          className={`${styles.tileLikeBtn} ${isLiked ? styles.tileLikeBtnActive : ''}`}
-          onClick={onLike}
-          aria-label={isLiked ? 'Unlike' : 'Like'}
-        >
-          {isLiked ? '❤️' : '🤍'}
-          {post.likeCount > 0 && <span className={styles.tileLikeCount}>{post.likeCount}</span>}
-        </button>
+    <div
+      className={`${styles.tile} ${expanded ? styles.tileExpanded : ''}`}
+      style={{ viewTransitionName: `tile-${post.id}` }}
+      onClick={onToggleExpand}
+    >
+      <div className={styles.tileImageWrap}>
+        {post.imageURL
+          ? <img src={post.imageURL} alt={post.caption || ''} className={styles.tileImg} />
+          : <div className={styles.tilePlaceholder} style={{ background: post.placeholderColor || '#e8dccb' }} />
+        }
+
+        {/* Likes + options only visible when expanded */}
+        {expanded && (
+          <div className={styles.tileOverlay}>
+            <button
+              className={styles.tileMenuBtn}
+              onClick={(e) => { e.stopPropagation(); onOptions() }}
+              aria-label="Options"
+            >···</button>
+            <button
+              className={`${styles.tileLikeBtn} ${isLiked ? styles.tileLikeBtnActive : ''}`}
+              onClick={(e) => { e.stopPropagation(); onLike() }}
+              aria-label={isLiked ? 'Unlike' : 'Like'}
+            >
+              {isLiked ? '❤️' : '🤍'}
+              {post.likeCount > 0 && <span className={styles.tileLikeCount}>{post.likeCount}</span>}
+            </button>
+          </div>
+        )}
       </div>
-      {post.caption && <p className={styles.tileCaption}>{post.caption}</p>}
+
+      {/* Contributor details below the image when expanded */}
+      {expanded && (
+        <div className={styles.tileDetails}>
+          <Link
+            to={post.createdBy === auth.currentUser?.uid ? '/profile' : `/users/${post.createdBy}`}
+            className={styles.detailsUser}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.detailsAvatar} style={{ background: poster?.avatarColor || '#b9b9c0' }}>
+              {poster?.avatarURL
+                ? <img src={poster.avatarURL} alt="" className={styles.detailsAvatarImg} />
+                : initials}
+            </div>
+            <span className={styles.detailsUsername}>@{poster?.username || 'unknown'}</span>
+          </Link>
+          {post.caption && <p className={styles.detailsCaption}>{post.caption}</p>}
+          <span className={styles.detailsLikes}>
+            {isLiked ? '❤️' : '🤍'} {post.likeCount || 0} like{post.likeCount === 1 ? '' : 's'}
+          </span>
+        </div>
+      )}
     </div>
   )
 }
