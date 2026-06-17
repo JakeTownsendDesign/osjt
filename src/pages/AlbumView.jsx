@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
+import CommentSection from '../components/CommentSection'
 import {
   doc, getDoc, collection, query, where,
   getDocs, setDoc, deleteDoc, updateDoc, increment, serverTimestamp,
@@ -193,6 +194,9 @@ export default function AlbumView() {
 
   return (
     <div className={styles.screen}>
+      {/* 2-col layout: left = album content, right = comments (desktop only) */}
+      <div className={styles.layout}>
+      <div className={styles.albumColumn}>
       {/* Header */}
       <header className={styles.header}>
         <button className={styles.backBtn} onClick={() => navigate(-1)}>‹</button>
@@ -266,6 +270,15 @@ export default function AlbumView() {
           <div className={styles.fabComplete}>Album complete 🎉</div>
         </div>
       )}
+
+      </div>{/* end albumColumn */}
+
+      {/* Comment panel — right on desktop, below on mobile/tablet */}
+      <div className={styles.commentColumn}>
+        <CommentSection albumId={albumId} isAlbumCreator={isCreator} />
+      </div>
+
+      </div>{/* end layout */}
 
       {/* Album creator menu sheet */}
       {showAlbumMenu && (
