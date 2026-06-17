@@ -4,7 +4,7 @@
   position: relative;
 }
 
-/* 2-column layout */
+/* Single-column layout — comments always stack below the photo grid */
 .layout {
   display: block;
 }
@@ -14,27 +14,7 @@
 }
 
 .commentColumn {
-  /* stacks below album content on mobile/tablet */
-}
-
-@media (min-width: 1200px) {
-  .layout {
-    display: grid;
-    grid-template-columns: 1fr 380px;
-    align-items: start;
-    min-height: 100vh;
-  }
-
-  .albumColumn {
-    border-right: 1px solid #f0f0f0;
-  }
-
-  .commentColumn {
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
-  }
+  /* stacks below on all screen sizes */
 }
 
 .loading {

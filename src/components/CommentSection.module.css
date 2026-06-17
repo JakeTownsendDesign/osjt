@@ -220,16 +220,3 @@
 .actionBtnDelete:hover { color: #e53935; }
 .actionBtnDeleteConfirm { color: #e53935; font-weight: 600; }
 
-/* ── Responsive ─────────────────────────────────────────────────────────── */
-@media (min-width: 1200px) {
-  .section {
-    border-top: none;
-    border-left: 1px solid #f0f0f0;
-    padding: 28px 24px 40px;
-    height: 100%;
-    overflow-y: auto;
-    position: sticky;
-    top: 0;
-    max-height: 100vh;
-  }
-}
