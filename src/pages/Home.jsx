@@ -116,25 +116,26 @@ function AlbumCard({ album, poster, isCurrentUser }) {
         <span className={styles.posterArrow}>›</span>
       </Link>
 
-      {/* Thumbnails */}
-      <div className={styles.thumbnailRow}>
-        {colors.slice(0, 4).map((color, i) => (
-          <div key={i} className={styles.thumbnail} style={{ background: color }} />
-        ))}
-      </div>
-
-      {/* Info */}
-      <div className={styles.albumInfo}>
-        <p className={styles.albumTitle}>{title}</p>
-        <p className={styles.albumDesc}>{description}</p>
-        <div className={styles.progressTrack}>
-          <div className={styles.progressFill} style={{ width: `${progress * 100}%` }} />
+      {/* Thumbnails — tapping navigates to album */}
+      <Link to={`/albums/${album.id}`} className={styles.thumbnailLink}>
+        <div className={styles.thumbnailRow}>
+          {colors.slice(0, 4).map((color, i) => (
+            <div key={i} className={styles.thumbnail} style={{ background: color }} />
+          ))}
         </div>
-        <div className={styles.albumMeta}>
-          <span className={styles.metaBold}>{photoCount} of {maxPhotos} photos</span>
-          <span className={styles.metaGray}>{contributorCount} contributor{contributorCount !== 1 ? 's' : ''}</span>
+        {/* Info */}
+        <div className={styles.albumInfo}>
+          <p className={styles.albumTitle}>{title}</p>
+          <p className={styles.albumDesc}>{description}</p>
+          <div className={styles.progressTrack}>
+            <div className={styles.progressFill} style={{ width: `${progress * 100}%` }} />
+          </div>
+          <div className={styles.albumMeta}>
+            <span className={styles.metaBold}>{photoCount} of {maxPhotos} photos</span>
+            <span className={styles.metaGray}>{contributorCount} contributor{contributorCount !== 1 ? 's' : ''}</span>
+          </div>
         </div>
-      </div>
+      </Link>
     </div>
   )
 }

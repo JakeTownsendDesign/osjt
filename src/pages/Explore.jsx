@@ -122,24 +122,24 @@ function PopularCard({ album, rank, poster }) {
         </Link>
       </div>
 
-      {/* Thumbnails */}
-      <div className={styles.thumbRow}>
-        {colors.slice(0, 4).map((c, i) => (
-          <div key={i} className={styles.thumb} style={{ background: c }} />
-        ))}
-      </div>
-
-      {/* Info */}
-      <div className={styles.cardBody}>
-        <p className={styles.cardTitle}>{album.title}</p>
-        <p className={styles.cardDesc}>{album.description}</p>
-        <div className={styles.statsRow}>
-          <Stat icon="📷" value={album.photoCount} label="photos" />
-          <Stat icon="❤️" value={album.likeCount ?? 0} label="likes" />
-          <Stat icon="💬" value={album.commentCount ?? 0} label="comments" />
-          <Stat icon="👥" value={album.contributorCount ?? 0} label="contributors" />
+      {/* Thumbnails + info — tapping navigates to album */}
+      <Link to={`/albums/${album.id}`} className={styles.cardLink}>
+        <div className={styles.thumbRow}>
+          {colors.slice(0, 4).map((c, i) => (
+            <div key={i} className={styles.thumb} style={{ background: c }} />
+          ))}
         </div>
-      </div>
+        <div className={styles.cardBody}>
+          <p className={styles.cardTitle}>{album.title}</p>
+          <p className={styles.cardDesc}>{album.description}</p>
+          <div className={styles.statsRow}>
+            <Stat icon="📷" value={album.photoCount} label="photos" />
+            <Stat icon="❤️" value={album.likeCount ?? 0} label="likes" />
+            <Stat icon="💬" value={album.commentCount ?? 0} label="comments" />
+            <Stat icon="👥" value={album.contributorCount ?? 0} label="contributors" />
+          </div>
+        </div>
+      </Link>
     </div>
   )
 }

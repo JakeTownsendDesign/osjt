@@ -252,3 +252,9 @@
     gap: 20px;
   }
 }
+
+.thumbnailLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}

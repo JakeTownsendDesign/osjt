@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import {
   doc, getDoc, setDoc, collection, query,
   where, getDocs, serverTimestamp, deleteDoc,
@@ -428,7 +429,7 @@ function AlbumTile({ album }) {
     : ['#e8dccb', '#d9c7b0', '#cbb89e', '#e2d2bc']
 
   return (
-    <div className={styles.albumTile}>
+    <Link to={`/albums/${album.id}`} className={styles.albumTile} style={{ textDecoration: 'none' }}>
       <div className={styles.tileThumbRow}>
         {colors.slice(0, 4).map((c, i) => (
           <div key={i} className={styles.tileThumb} style={{ background: c }} />
@@ -436,7 +437,7 @@ function AlbumTile({ album }) {
       </div>
       <p className={styles.tileTitle}>{album.title}</p>
       <p className={styles.tileMeta}>{album.photoCount} / {album.maxPhotos} photos</p>
-    </div>
+    </Link>
   )
 }
 

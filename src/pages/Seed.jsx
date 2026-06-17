@@ -179,6 +179,7 @@ export default function Seed() {
           ...data,
           score,
           createdBy:  currentUser.uid,
+          createdAt:  serverTimestamp(),
           updatedAt:  serverTimestamp(),
         })
         addLog(`  ✓ ${album.title}`)
@@ -186,6 +187,46 @@ export default function Seed() {
         addLog(`  ✗ ${album.title}: ${err.code || err.message}`, 'error')
         hasError = true
       }
+    }
+
+    // ── 4. Seed posts ──────────────────────────────────────────────────────
+    addLog('Seeding posts…')
+    const CONTRIBUTORS = ['user-alice', 'user-bob', 'user-carol', 'user-dave', 'user-emma', currentUser.uid]
+    const POST_COLORS = {
+      'spain-2026':    ['#e8dccb','#d9c7b0','#cbb89e','#e2d2bc','#e5d6c0','#dcc9ae','#d0bca0','#cfc0a8','#dbcdb4'],
+      'sunday-coffee': ['#c8d8e8','#b0c4d9','#9eb3cb','#c2d0df','#b8cfe4','#a4bdd5','#d0dcea','#bccde2','#a8bcd8'],
+      'golden-hour':   ['#f5e6c8','#f0d9a8','#e8c98a','#f2ddb0','#eddaa6','#e8ce94','#f0d8a0','#eacf98','#e5c88c'],
+    }
+    const CAPTIONS = [
+      'Golden light hitting just right ✨', 'Can\'t stop thinking about this view 🌊',
+      'Perfect afternoon 🌅', 'This one surprised me 📸', 'Had to share this 🔥',
+      'Worth the early wake up', 'One of those moments', 'My favourite shot so far',
+      'The light was unreal today',
+    ]
+    const albumIds = ['spain-2026', 'sunday-coffee', 'golden-hour']
+    let postIndex = 0
+    for (const albumId of albumIds) {
+      const colors = POST_COLORS[albumId]
+      for (let i = 0; i < colors.length; i++) {
+        const postId = `post-${albumId}-${i}`
+        const contributorId = CONTRIBUTORS[i % CONTRIBUTORS.length]
+        try {
+          await setDoc(doc(db, 'posts', postId), {
+            albumId,
+            createdBy: contributorId,
+            imageURL: null,
+            placeholderColor: colors[i],
+            caption: CAPTIONS[postIndex % CAPTIONS.length],
+            likeCount: Math.floor(Math.random() * 30),
+            createdAt: serverTimestamp(),
+          })
+          postIndex++
+        } catch (err) {
+          addLog(`  ✗ post ${postId}: ${err.code || err.message}`, 'error')
+          hasError = true
+        }
+      }
+      addLog(`  ✓ ${colors.length} posts for ${albumId}`)
     }
 
     if (hasError) {
