@@ -52,14 +52,13 @@ export default function CommentSection({ albumId, isAlbumCreator }) {
         })
         setRepliesMap(rm)
 
-        // Fetch user profiles for all commenters
-        const uids = [...new Set(all.map((c) => c.createdBy).filter(Boolean))]
-        if (uids.length > 0) {
-          const userDocs = await Promise.all(uids.map((uid) => getDoc(doc(db, 'users', uid))))
-          const map = {}
-          userDocs.forEach((s) => { if (s.exists()) map[s.id] = s.data() })
-          setCommentUsers(map)
-        }
+        // Fetch user profiles for all commenters — always include current user
+        // so their avatar shows in the compose field even before they've commented
+        const uids = [...new Set([user.uid, ...all.map((c) => c.createdBy).filter(Boolean)])]
+        const userDocs = await Promise.all(uids.map((uid) => getDoc(doc(db, 'users', uid))))
+        const map = {}
+        userDocs.forEach((s) => { if (s.exists()) map[s.id] = s.data() })
+        setCommentUsers(map)
 
         // Which comments has current user liked?
         const likeSnap = await getDocs(
