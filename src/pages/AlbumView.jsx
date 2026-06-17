@@ -379,44 +379,40 @@ function PhotoTile({ post, poster, isLiked, isCreator, expanded, onToggleExpand,
           : <div className={styles.tilePlaceholder} style={{ background: post.placeholderColor || '#e8dccb' }} />
         }
 
-        {/* Likes + options only visible when expanded */}
-        {expanded && (
-          <div className={styles.tileOverlay}>
-            <button
-              className={styles.tileMenuBtn}
-              onClick={(e) => { e.stopPropagation(); onOptions() }}
-              aria-label="Options"
-            >···</button>
-            <button
-              className={`${styles.tileLikeBtn} ${isLiked ? styles.tileLikeBtnActive : ''}`}
-              onClick={(e) => { e.stopPropagation(); onLike() }}
-              aria-label={isLiked ? 'Unlike' : 'Like'}
-            >
-              {isLiked ? '❤️' : '🤍'}
-              {post.likeCount > 0 && <span className={styles.tileLikeCount}>{post.likeCount}</span>}
-            </button>
-          </div>
-        )}
-
-        {/* Contributor details overlaid on the bottom of the image when expanded */}
+        {/* Contributor details + actions overlaid on the bottom when expanded */}
         {expanded && (
           <div className={styles.tileDetails}>
-            <Link
-              to={post.createdBy === auth.currentUser?.uid ? '/profile' : `/users/${post.createdBy}`}
-              className={styles.detailsUser}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className={styles.detailsAvatar} style={{ background: poster?.avatarColor || '#b9b9c0' }}>
-                {poster?.avatarURL
-                  ? <img src={poster.avatarURL} alt="" className={styles.detailsAvatarImg} />
-                  : initials}
-              </div>
-              <span className={styles.detailsUsername}>@{poster?.username || 'unknown'}</span>
-            </Link>
-            {post.caption && <p className={styles.detailsCaption}>{post.caption}</p>}
-            <span className={styles.detailsLikes}>
-              {post.likeCount || 0} like{post.likeCount === 1 ? '' : 's'}
-            </span>
+            <div className={styles.detailsInfo}>
+              <Link
+                to={post.createdBy === auth.currentUser?.uid ? '/profile' : `/users/${post.createdBy}`}
+                className={styles.detailsUser}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className={styles.detailsAvatar} style={{ background: poster?.avatarColor || '#b9b9c0' }}>
+                  {poster?.avatarURL
+                    ? <img src={poster.avatarURL} alt="" className={styles.detailsAvatarImg} />
+                    : initials}
+                </div>
+                <span className={styles.detailsUsername}>@{poster?.username || 'unknown'}</span>
+              </Link>
+              {post.caption && <p className={styles.detailsCaption}>{post.caption}</p>}
+            </div>
+
+            <div className={styles.detailsActions}>
+              <button
+                className={`${styles.tileLikeBtn} ${isLiked ? styles.tileLikeBtnActive : ''}`}
+                onClick={(e) => { e.stopPropagation(); onLike() }}
+                aria-label={isLiked ? 'Unlike' : 'Like'}
+              >
+                {isLiked ? '❤️' : '🤍'}
+                {post.likeCount > 0 && <span className={styles.tileLikeCount}>{post.likeCount}</span>}
+              </button>
+              <button
+                className={styles.tileMenuBtn}
+                onClick={(e) => { e.stopPropagation(); onOptions() }}
+                aria-label="Options"
+              >···</button>
+            </div>
           </div>
         )}
       </div>
