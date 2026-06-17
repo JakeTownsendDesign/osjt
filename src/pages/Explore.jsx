@@ -97,6 +97,7 @@ function PopularCard({ album, rank, poster }) {
   const colors = album.thumbnailColors?.length >= 4
     ? album.thumbnailColors
     : ['#e8dccb', '#d9c7b0', '#cbb89e', '#e2d2bc']
+  const urls = album.thumbnailURLs || []
 
   const currentUser = auth.currentUser
   const isOwn = album.createdBy === currentUser?.uid
@@ -126,7 +127,9 @@ function PopularCard({ album, rank, poster }) {
       <Link to={`/albums/${album.id}`} className={styles.cardLink}>
         <div className={styles.thumbRow}>
           {colors.slice(0, 4).map((c, i) => (
-            <div key={i} className={styles.thumb} style={{ background: c }} />
+            <div key={i} className={styles.thumb} style={{ background: c }}>
+              {urls[i] && <img src={urls[i]} alt="" className={styles.thumbImg} />}
+            </div>
           ))}
         </div>
         <div className={styles.cardBody}>

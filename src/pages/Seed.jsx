@@ -309,8 +309,10 @@ export default function Seed() {
       const { id, owner, posts: _posts, ...data } = album
       try {
         const score = (data.photoCount * 3) + (data.likeCount * 2) + data.commentCount
+        const thumbnailURLs = album.posts.slice(0, 4).map((p) => img(p.seed))
         await setDoc(doc(db, 'albums', id), {
           ...data,
+          thumbnailURLs,
           score,
           createdBy,
           createdAt: serverTimestamp(),

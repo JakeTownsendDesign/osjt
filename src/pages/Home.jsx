@@ -88,7 +88,7 @@ export default function Home() {
 }
 
 function AlbumCard({ album, poster, isCurrentUser }) {
-  const { title, description, photoCount, maxPhotos, contributorCount, thumbnailColors = [], createdBy } = album
+  const { title, description, photoCount, maxPhotos, contributorCount, thumbnailColors = [], thumbnailURLs = [], createdBy } = album
   const progress = maxPhotos > 0 ? Math.min(photoCount / maxPhotos, 1) : 0
   const colors = thumbnailColors.length >= 4
     ? thumbnailColors
@@ -120,7 +120,9 @@ function AlbumCard({ album, poster, isCurrentUser }) {
       <Link to={`/albums/${album.id}`} className={styles.thumbnailLink}>
         <div className={styles.thumbnailRow}>
           {colors.slice(0, 4).map((color, i) => (
-            <div key={i} className={styles.thumbnail} style={{ background: color }} />
+            <div key={i} className={styles.thumbnail} style={{ background: color }}>
+              {thumbnailURLs[i] && <img src={thumbnailURLs[i]} alt="" className={styles.thumbnailImg} />}
+            </div>
           ))}
         </div>
         {/* Info */}

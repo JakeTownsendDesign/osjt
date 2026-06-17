@@ -91,12 +91,15 @@ function AlbumTile({ album }) {
   const colors = album.thumbnailColors?.length >= 4
     ? album.thumbnailColors
     : ['#e8dccb', '#d9c7b0', '#cbb89e', '#e2d2bc']
+  const urls = album.thumbnailURLs || []
 
   return (
     <div className={styles.albumTile}>
       <div className={styles.tileThumbRow}>
         {colors.slice(0, 4).map((c, i) => (
-          <div key={i} className={styles.tileThumb} style={{ background: c }} />
+          <div key={i} className={styles.tileThumb} style={{ background: c }}>
+            {urls[i] && <img src={urls[i]} alt="" className={styles.tileThumbImg} />}
+          </div>
         ))}
       </div>
       <p className={styles.tileTitle}>{album.title}</p>
