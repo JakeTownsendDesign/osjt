@@ -16,7 +16,7 @@ export default function BottomNav() {
         <span>Explore</span>
       </NavLink>
 
-      <button className={styles.createBtn} onClick={() => navigate('/create')} aria-label="Create">
+      <button className={styles.createBtn} onClick={() => navigate('/create-album')} aria-label="Create">
         <span className={styles.plus}>+</span>
       </button>
 
