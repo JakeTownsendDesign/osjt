@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
-  doc, getDoc, collection, query, where, orderBy,
+  doc, getDoc, collection, query, where,
   getDocs, setDoc, deleteDoc, updateDoc, increment, serverTimestamp,
 } from 'firebase/firestore'
 import { auth, db } from '../firebase'
@@ -17,6 +17,7 @@ export default function AlbumView() {
   const [contributors, setContributors] = useState({}) // uid → profile
   const [likedPostIds, setLikedPostIds] = useState(new Set())
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [notFound, setNotFound] = useState(false)
 
   // Menu state
@@ -34,34 +35,49 @@ export default function AlbumView() {
   // ── Load ──
   useEffect(() => {
     async function load() {
-      const albumSnap = await getDoc(doc(db, 'albums', albumId))
-      if (!albumSnap.exists()) { setNotFound(true); setLoading(false); return }
-      const albumData = { id: albumSnap.id, ...albumSnap.data() }
-      setAlbum(albumData)
-      setEditTitle(albumData.title)
-      setEditDesc(albumData.description)
+      try {
+        // Album
+        const albumSnap = await getDoc(doc(db, 'albums', albumId))
+        if (!albumSnap.exists()) { setNotFound(true); setLoading(false); return }
+        const albumData = { id: albumSnap.id, ...albumSnap.data() }
+        setAlbum(albumData)
+        setEditTitle(albumData.title)
+        setEditDesc(albumData.description)
 
-      // Posts ordered chronologically
-      const postSnap = await getDocs(
-        query(collection(db, 'posts'), where('albumId', '==', albumId), orderBy('createdAt', 'asc'))
-      )
-      const postList = postSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
-      setPosts(postList)
+        // Posts — filter only, no orderBy (avoids composite index requirement)
+        // Sort chronologically client-side using the createdAt timestamp seconds
+        const postSnap = await getDocs(
+          query(collection(db, 'posts'), where('albumId', '==', albumId))
+        )
+        const postList = postSnap.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0))
+        setPosts(postList)
 
-      // Contributor profiles (unique posters)
-      const uids = [...new Set(postList.map((p) => p.createdBy).filter(Boolean))]
-      const userDocs = await Promise.all(uids.map((uid) => getDoc(doc(db, 'users', uid))))
-      const map = {}
-      userDocs.forEach((s) => { if (s.exists()) map[s.id] = s.data() })
-      setContributors(map)
+        // Contributor profiles (unique posters)
+        const uids = [...new Set(postList.map((p) => p.createdBy).filter(Boolean))]
+        if (uids.length > 0) {
+          const userDocs = await Promise.all(uids.map((uid) => getDoc(doc(db, 'users', uid))))
+          const map = {}
+          userDocs.forEach((s) => { if (s.exists()) map[s.id] = s.data() })
+          setContributors(map)
+        }
 
-      // Which posts has current user liked?
-      const likeSnap = await getDocs(
-        query(collection(db, 'likes'), where('userId', '==', user.uid), where('albumId', '==', albumId))
-      )
-      setLikedPostIds(new Set(likeSnap.docs.map((d) => d.data().postId)))
+        // Which posts has the current user liked? — single field filter, no index needed
+        const likeSnap = await getDocs(
+          query(collection(db, 'likes'), where('userId', '==', user.uid))
+        )
+        const likedInThisAlbum = likeSnap.docs
+          .filter((d) => d.data().albumId === albumId)
+          .map((d) => d.data().postId)
+        setLikedPostIds(new Set(likedInThisAlbum))
 
-      setLoading(false)
+      } catch (err) {
+        console.error('AlbumView load error:', err)
+        setLoadError(`Failed to load album: ${err.code || err.message}`)
+      } finally {
+        setLoading(false)
+      }
     }
     load()
   }, [albumId, user])
@@ -158,6 +174,12 @@ export default function AlbumView() {
   }
 
   if (loading) return <div className={styles.screen}><p className={styles.loading}>Loading…</p></div>
+  if (loadError) return (
+    <div className={styles.screen}>
+      <button className={styles.backBtn} onClick={() => navigate(-1)} style={{ margin: '56px 20px 0' }}>‹</button>
+      <p className={styles.loading} style={{ color: '#e53935' }}>{loadError}</p>
+    </div>
+  )
   if (notFound) return (
     <div className={styles.screen}>
       <button className={styles.backBtn} onClick={() => navigate(-1)}>‹ Back</button>
