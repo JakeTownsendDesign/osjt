@@ -132,6 +132,17 @@ export default function Profile() {
   function handleFileChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setSaveError('Please select an image file.')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveError('Image must be under 5 MB.')
+      return
+    }
+
+    setSaveError('')
     setAvatarFile(file)
     setAvatarPreview(URL.createObjectURL(file))
     setSaveSuccess(false)
@@ -159,6 +170,9 @@ export default function Profile() {
 
       // 1. Upload new avatar if selected
       if (avatarFile) {
+        if (!storage.app.options.storageBucket) {
+          throw new Error('STORAGE_NOT_CONFIGURED')
+        }
         const storageRef = ref(storage, `avatars/${user.uid}`)
         await uploadBytes(storageRef, avatarFile)
         avatarURL = await getDownloadURL(storageRef)
@@ -211,7 +225,7 @@ export default function Profile() {
       setUsernameStatus(null)
       setSaveSuccess(true)
     } catch (err) {
-      setSaveError(friendlyError(err.code) || err.message)
+      setSaveError(friendlyError(err.code, err.message) || err.message)
     } finally {
       setSaving(false)
     }
@@ -439,12 +453,21 @@ function CameraIcon() {
   )
 }
 
-function friendlyError(code) {
+function friendlyError(code, message) {
   switch (code) {
     case 'auth/wrong-password': return 'Incorrect password.'
     case 'auth/email-already-in-use': return 'That email is already linked to another account.'
     case 'auth/invalid-email': return 'Please enter a valid email address.'
     case 'auth/requires-recent-login': return 'Please re-authenticate to make this change.'
-    default: return null
+    case 'storage/unauthorized':
+      return 'Photo upload failed: storage permission denied. Make sure Firebase Storage rules allow authenticated writes to avatars/{uid}.'
+    case 'storage/unknown':
+    case 'storage/bucket-not-found':
+      return 'Photo upload failed: Firebase Storage is not set up. Create a Storage bucket in the Firebase Console and configure your rules.'
+    default:
+      if (message === 'STORAGE_NOT_CONFIGURED') {
+        return 'Photo upload failed: VITE_FIREBASE_STORAGE_BUCKET is missing from your .env file.'
+      }
+      return null
   }
 }
