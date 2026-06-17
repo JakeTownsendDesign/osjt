@@ -1,97 +1,46 @@
 .screen {
   min-height: 100vh;
-  background: #faf7f2;
+  background: #ffffff;
 }
 
 .loadingText {
   text-align: center;
-  padding: 80px 20px;
+  padding: 48px 20px;
   font-size: 14px;
   color: #8a8a93;
 }
 
-/* Nav bar */
-.navBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 56px 20px 16px;
-  background: #faf7f2;
+/* Header */
+.header {
+  padding: 54px 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 28px;
 }
 
-.cancelBtn {
-  background: none;
-  border: none;
-  font-size: 16px;
-  font-weight: 400;
-  font-family: inherit;
-  color: #8a8a93;
-  cursor: pointer;
-  padding: 0;
-}
-
-.navTitle {
-  font-size: 17px;
-  font-weight: 600;
-  color: #1b1b1f;
-}
-
-.createBtn {
-  background: none;
-  border: none;
-  font-size: 16px;
-  font-weight: 600;
-  font-family: inherit;
-  color: #ff5c39;
-  cursor: pointer;
-  padding: 0;
-  min-width: 48px;
-  text-align: right;
-}
-
-.createBtn:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-/* Slot banner */
-.slotBanner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0 20px 24px;
-  background: #ffffff;
-  border: 1px solid #ececec;
-  border-radius: 14px;
-  padding: 14px 16px;
-}
-
-.slotBadge {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #ffe7df;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
+.pageTitle {
+  font-size: 26px;
   font-weight: 700;
-  color: #ff5c39;
-  flex-shrink: 0;
+  color: #1b1b1f;
+  margin-bottom: 6px;
 }
 
-.slotBannerText {
-  font-size: 13px;
-  font-weight: 500;
+.pageSubtitle {
+  font-size: 14px;
+  color: #8a8a93;
+}
+
+.pageSubtitle strong {
   color: #1b1b1f;
+  font-weight: 600;
 }
 
 /* Form */
 .form {
-  padding: 0 20px;
+  padding: 0 20px 40px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+  max-width: 560px;
 }
 
 .field {
@@ -101,33 +50,39 @@
 }
 
 .label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: #8a8a93;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.6px;
 }
 
-.input {
+.input,
+.textarea {
   width: 100%;
-  height: 52px;
-  background: #ffffff;
+  background: #f7f7f7;
   border: 1px solid #ececec;
-  border-radius: 14px;
-  padding: 0 16px;
-  font-size: 16px;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 15px;
   font-weight: 400;
   font-family: inherit;
   color: #1b1b1f;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.15s;
+  resize: none;
 }
 
-.input::placeholder {
+.input { height: 50px; padding: 0 16px; }
+
+.input::placeholder,
+.textarea::placeholder {
   color: #b9b9c0;
 }
 
-.input:focus {
+.input:focus,
+.textarea:focus {
   border-color: #ff5c39;
+  background: #ffffff;
 }
 
 .inputError {
@@ -140,13 +95,18 @@
   font-weight: 500;
 }
 
+.hint {
+  font-size: 12px;
+  color: #b9b9c0;
+}
+
 /* Stepper */
 .stepperRow {
   display: flex;
   align-items: center;
-  background: #ffffff;
+  background: #f7f7f7;
   border: 1px solid #ececec;
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 0 16px;
   height: 56px;
 }
@@ -167,40 +127,29 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: #faf7f2;
-  border: none;
+  background: #ffffff;
+  border: 1px solid #ececec;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 400;
   color: #1b1b1f;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s;
   font-family: inherit;
   line-height: 1;
+  transition: background 0.1s;
 }
 
-.stepperBtn:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.stepperBtn:not(:disabled):active {
-  background: #ecddd4;
-}
-
-.stepperHint {
-  font-size: 12px;
-  color: #b9b9c0;
-}
+.stepperBtn:hover:not(:disabled) { background: #f0f0f0; }
+.stepperBtn:disabled { opacity: 0.3; cursor: default; }
 
 /* Public row */
 .publicRow {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: #ffffff;
+  background: #f7f7f7;
   border: 1px solid #ececec;
   border-radius: 14px;
   padding: 16px;
@@ -219,18 +168,16 @@
   flex-shrink: 0;
 }
 
-.publicText {
-  flex: 1;
-}
+.publicText { flex: 1; }
 
 .publicTitle {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: #1b1b1f;
 }
 
 .publicSub {
-  font-size: 13px;
+  font-size: 12px;
   color: #8a8a93;
   margin-top: 2px;
 }
@@ -245,31 +192,58 @@
   flex-shrink: 0;
 }
 
-/* Submit error */
+/* Submit */
 .submitError {
   font-size: 13px;
   color: #e53935;
   font-weight: 500;
-  text-align: center;
 }
 
-/* Slot used state */
+.submitBtn {
+  width: 100%;
+  height: 52px;
+  background: #ff5c39;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancelLink {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #8a8a93;
+  text-decoration: none;
+}
+
+/* Slot used */
 .slotUsedContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 48px 32px;
-  text-align: center;
+  align-items: flex-start;
+  padding: 0 20px 40px;
   gap: 12px;
+  max-width: 560px;
 }
 
 .slotUsedIcon {
-  font-size: 52px;
-  margin-bottom: 8px;
+  font-size: 48px;
+  margin-bottom: 4px;
 }
 
 .slotUsedTitle {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #1b1b1f;
 }
@@ -278,25 +252,23 @@
   font-size: 15px;
   color: #8a8a93;
   line-height: 1.55;
-  max-width: 280px;
 }
 
 .existingAlbum {
-  margin-top: 16px;
   width: 100%;
-  background: #ffffff;
+  background: #f7f7f7;
   border: 1px solid #ececec;
   border-radius: 14px;
   padding: 16px;
-  text-align: left;
+  margin-top: 4px;
 }
 
 .existingLabel {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   color: #8a8a93;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   margin-bottom: 6px;
 }
 
@@ -312,16 +284,15 @@
   margin-top: 3px;
 }
 
-.doneBtn {
-  margin-top: 8px;
-  height: 52px;
-  width: 100%;
-  background: #ff5c39;
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
-  font-family: inherit;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .header { padding: 32px 32px 24px; }
+  .form { padding: 0 32px 48px; }
+  .slotUsedContainer { padding: 0 32px 48px; }
+}
+
+@media (min-width: 1200px) {
+  .header { padding: 40px 48px 28px; }
+  .form { padding: 0 48px 48px; }
+  .slotUsedContainer { padding: 0 48px 48px; }
 }

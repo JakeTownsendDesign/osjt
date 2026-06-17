@@ -60,7 +60,7 @@ export default function App() {
         <Route path="/profile"      element={<ProtectedRoute user={user}><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
         <Route path="/seed"         element={<ProtectedRoute user={user}><AppLayout><Seed /></AppLayout></ProtectedRoute>} />
         <Route path="/users/:uid"   element={<ProtectedRoute user={user}><AppLayout><UserProfile /></AppLayout></ProtectedRoute>} />
-        <Route path="/create-album"    element={<ProtectedRoute user={user}><CreateAlbum /></ProtectedRoute>} />
+        <Route path="/create-album"    element={<ProtectedRoute user={user}><AppLayout><CreateAlbum /></AppLayout></ProtectedRoute>} />
         <Route path="/albums/:albumId" element={<ProtectedRoute user={user}><AppLayout><AlbumView /></AppLayout></ProtectedRoute>} />
         <Route path="*"             element={<Navigate to="/" replace />} />
       </Routes>
