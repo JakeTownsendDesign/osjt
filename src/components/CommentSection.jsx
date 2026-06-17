@@ -5,6 +5,7 @@ import {
   doc, setDoc, deleteDoc, updateDoc, increment, serverTimestamp, getDoc,
 } from 'firebase/firestore'
 import { auth, db } from '../firebase'
+import { useUser } from '../context/UserContext'
 import styles from './CommentSection.module.css'
 
 function timeAgo(ts) {
@@ -17,7 +18,7 @@ function timeAgo(ts) {
 }
 
 export default function CommentSection({ albumId, isAlbumCreator }) {
-  const user = auth.currentUser
+  const { user, profile: currentUserProfile } = useUser()
 
   const [topLevel, setTopLevel]       = useState([])   // top-level comments
   const [repliesMap, setRepliesMap]   = useState({})   // parentId → reply[]
@@ -52,12 +53,13 @@ export default function CommentSection({ albumId, isAlbumCreator }) {
         })
         setRepliesMap(rm)
 
-        // Fetch user profiles for all commenters — always include current user
-        // so their avatar shows in the compose field even before they've commented
-        const uids = [...new Set([user.uid, ...all.map((c) => c.createdBy).filter(Boolean)])]
-        const userDocs = await Promise.all(uids.map((uid) => getDoc(doc(db, 'users', uid))))
-        const map = {}
-        userDocs.forEach((s) => { if (s.exists()) map[s.id] = s.data() })
+        // Fetch profiles for other commenters — current user comes from context
+        const otherUids = [...new Set(all.map((c) => c.createdBy).filter((uid) => uid && uid !== user.uid))]
+        const map = currentUserProfile ? { [user.uid]: currentUserProfile } : {}
+        if (otherUids.length > 0) {
+          const userDocs = await Promise.all(otherUids.map((uid) => getDoc(doc(db, 'users', uid))))
+          userDocs.forEach((s) => { if (s.exists()) map[s.id] = s.data() })
+        }
         setCommentUsers(map)
 
         // Which comments has current user liked?
@@ -106,10 +108,9 @@ export default function CommentSection({ albumId, isAlbumCreator }) {
         createdAt: serverTimestamp(),
       })
 
-      // Ensure current user's profile is in the map
-      if (!commentUsers[user.uid]) {
-        const snap = await getDoc(doc(db, 'users', user.uid))
-        if (snap.exists()) setCommentUsers((m) => ({ ...m, [user.uid]: snap.data() }))
+      // Ensure current user's profile is in the map (from context)
+      if (!commentUsers[user.uid] && currentUserProfile) {
+        setCommentUsers((m) => ({ ...m, [user.uid]: currentUserProfile }))
       }
 
       if (!parentId) {
