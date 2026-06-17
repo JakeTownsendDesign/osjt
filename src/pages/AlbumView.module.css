@@ -251,13 +251,16 @@
 /* Overlay with like + options — only rendered when expanded */
 .tileOverlay {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
   padding: 12px;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, transparent 25%, transparent 65%, rgba(0,0,0,0.3) 100%);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%);
   pointer-events: none;
 }
 
@@ -301,12 +304,17 @@
   color: #ffffff;
 }
 
-/* Contributor details under the expanded image */
+/* Contributor details overlaid on the bottom of the expanded image */
 .tileDetails {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 12px 4px 8px;
+  padding: 40px 16px 16px;
+  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.45) 45%, transparent 100%);
   animation: detailsIn 0.3s ease both;
 }
 
@@ -335,6 +343,7 @@
   color: #ffffff;
   overflow: hidden;
   flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,0.7);
 }
 
 .detailsAvatarImg {
@@ -347,18 +356,18 @@
 .detailsUsername {
   font-size: 14px;
   font-weight: 600;
-  color: #1b1b1f;
+  color: #ffffff;
 }
 
 .detailsCaption {
   font-size: 14px;
-  color: #1b1b1f;
+  color: rgba(255,255,255,0.92);
   line-height: 1.45;
 }
 
 .detailsLikes {
   font-size: 13px;
-  color: #8a8a93;
+  color: rgba(255,255,255,0.75);
   font-weight: 500;
 }
 

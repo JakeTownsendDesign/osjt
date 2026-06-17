@@ -397,29 +397,29 @@ function PhotoTile({ post, poster, isLiked, isCreator, expanded, onToggleExpand,
             </button>
           </div>
         )}
-      </div>
 
-      {/* Contributor details below the image when expanded */}
-      {expanded && (
-        <div className={styles.tileDetails}>
-          <Link
-            to={post.createdBy === auth.currentUser?.uid ? '/profile' : `/users/${post.createdBy}`}
-            className={styles.detailsUser}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={styles.detailsAvatar} style={{ background: poster?.avatarColor || '#b9b9c0' }}>
-              {poster?.avatarURL
-                ? <img src={poster.avatarURL} alt="" className={styles.detailsAvatarImg} />
-                : initials}
-            </div>
-            <span className={styles.detailsUsername}>@{poster?.username || 'unknown'}</span>
-          </Link>
-          {post.caption && <p className={styles.detailsCaption}>{post.caption}</p>}
-          <span className={styles.detailsLikes}>
-            {isLiked ? '❤️' : '🤍'} {post.likeCount || 0} like{post.likeCount === 1 ? '' : 's'}
-          </span>
-        </div>
-      )}
+        {/* Contributor details overlaid on the bottom of the image when expanded */}
+        {expanded && (
+          <div className={styles.tileDetails}>
+            <Link
+              to={post.createdBy === auth.currentUser?.uid ? '/profile' : `/users/${post.createdBy}`}
+              className={styles.detailsUser}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={styles.detailsAvatar} style={{ background: poster?.avatarColor || '#b9b9c0' }}>
+                {poster?.avatarURL
+                  ? <img src={poster.avatarURL} alt="" className={styles.detailsAvatarImg} />
+                  : initials}
+              </div>
+              <span className={styles.detailsUsername}>@{poster?.username || 'unknown'}</span>
+            </Link>
+            {post.caption && <p className={styles.detailsCaption}>{post.caption}</p>}
+            <span className={styles.detailsLikes}>
+              {post.likeCount || 0} like{post.likeCount === 1 ? '' : 's'}
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
