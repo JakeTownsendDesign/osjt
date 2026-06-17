@@ -229,6 +229,51 @@ export default function Seed() {
       addLog(`  ✓ ${colors.length} posts for ${albumId}`)
     }
 
+    // ── 5. Seed comments (with replies) ───────────────────────────────────
+    addLog('Seeding comments…')
+
+    const SEED_COMMENTS = [
+      // spain-2026 top-level
+      { id: 'comment-spain-1', albumId: 'spain-2026', parentId: null, createdBy: 'user-alice', text: 'This album is giving me serious holiday envy 😍 When are you going back?', likeCount: 8 },
+      { id: 'comment-spain-2', albumId: 'spain-2026', parentId: null, createdBy: 'user-bob',   text: 'The lighting in these shots is incredible. What time of day were most of these taken?', likeCount: 5 },
+      { id: 'comment-spain-3', albumId: 'spain-2026', parentId: null, createdBy: 'user-carol', text: 'Sangria on a rooftop is my love language. Great album theme 🍊', likeCount: 12 },
+      { id: 'comment-spain-4', albumId: 'spain-2026', parentId: null, createdBy: currentUser.uid, text: 'Keep the photos coming everyone — only 63 slots left!', likeCount: 3 },
+      // spain-2026 replies
+      { id: 'comment-spain-1-reply-1', albumId: 'spain-2026', parentId: 'comment-spain-1', createdBy: 'user-dave', text: 'Same! Already looking at flights for next summer 🛫', likeCount: 2 },
+      { id: 'comment-spain-1-reply-2', albumId: 'spain-2026', parentId: 'comment-spain-1', createdBy: 'user-emma', text: 'The south coast in April is magic. Highly recommend!', likeCount: 4 },
+      { id: 'comment-spain-2-reply-1', albumId: 'spain-2026', parentId: 'comment-spain-2', createdBy: 'user-alice', text: 'Golden hour mostly — around 6–7pm. Makes everything look like a painting.', likeCount: 6 },
+
+      // sunday-coffee top-level
+      { id: 'comment-coffee-1', albumId: 'sunday-coffee', parentId: null, createdBy: 'user-emma', text: 'This is my favourite album on here. There is something so calming about a good cup of coffee in a new place ☕', likeCount: 19 },
+      { id: 'comment-coffee-2', albumId: 'sunday-coffee', parentId: null, createdBy: 'user-carol', text: 'Mine was a cortado in a tiny place in Lisbon. Submitting mine tomorrow!', likeCount: 7 },
+      { id: 'comment-coffee-3', albumId: 'sunday-coffee', parentId: null, createdBy: 'user-alice', text: 'The variety here is wild. Flat whites, pour-overs, Greek frappes... love it all.', likeCount: 11 },
+      // sunday-coffee replies
+      { id: 'comment-coffee-1-reply-1', albumId: 'sunday-coffee', parentId: 'comment-coffee-1', createdBy: 'user-bob',  text: 'Completely agree. This is the most peaceful scroll on the internet.', likeCount: 5 },
+      { id: 'comment-coffee-2-reply-1', albumId: 'sunday-coffee', parentId: 'comment-coffee-2', createdBy: 'user-emma', text: 'Oh a Lisbon cortado sounds incredible, can\'t wait to see it!', likeCount: 3 },
+
+      // golden-hour top-level
+      { id: 'comment-golden-1', albumId: 'golden-hour', parentId: null, createdBy: 'user-bob',   text: 'Only 12 photos in and this is already one of the best albums I\'ve seen. That warm glow is everything.', likeCount: 9 },
+      { id: 'comment-golden-2', albumId: 'golden-hour', parentId: null, createdBy: 'user-dave',  text: 'Chasing golden hour is a sport and I am here for it 🌇', likeCount: 6 },
+      // golden-hour reply
+      { id: 'comment-golden-1-reply-1', albumId: 'golden-hour', parentId: 'comment-golden-1', createdBy: 'user-carol', text: 'The one I\'m submitting tomorrow was taken at a lake — the reflection doubled the glow 🤩', likeCount: 4 },
+    ]
+
+    let commentCount = 0
+    for (const comment of SEED_COMMENTS) {
+      const { id, ...data } = comment
+      try {
+        await setDoc(doc(db, 'comments', id), {
+          ...data,
+          createdAt: serverTimestamp(),
+        })
+        commentCount++
+      } catch (err) {
+        addLog(`  ✗ ${id}: ${err.code || err.message}`, 'error')
+        hasError = true
+      }
+    }
+    if (commentCount > 0) addLog(`  ✓ ${commentCount} comments across 3 albums`)
+
     if (hasError) {
       addLog('⚠️  Some writes failed — see errors above. Likely a Firestore rules issue.', 'warn')
       setStatus('error')
