@@ -205,9 +205,19 @@ export default function AlbumView() {
         )}
       </header>
 
-      {/* Title + description */}
+      {/* Title + description + submit CTA */}
       <div className={styles.titleSection}>
-        <h1 className={styles.albumTitle}>{album.title}</h1>
+        <div className={styles.titleRow}>
+          <h1 className={styles.albumTitle}>{album.title}</h1>
+          {album.status !== 'complete' && (
+            <Link to={`/upload?albumId=${albumId}`} className={styles.submitBtn}>
+              + Submit photo
+            </Link>
+          )}
+          {album.status === 'complete' && (
+            <span className={styles.completeTag}>Complete 🎉</span>
+          )}
+        </div>
         <p className={styles.albumDesc}>{album.description}</p>
       </div>
 
@@ -257,19 +267,6 @@ export default function AlbumView() {
         ))}
       </div>
 
-      {/* Add today's photo FAB */}
-      {album.status !== 'complete' && (
-        <div className={styles.fabWrap}>
-          <Link to={`/upload?albumId=${albumId}`} className={styles.fab}>
-            + Add today's photo
-          </Link>
-        </div>
-      )}
-      {album.status === 'complete' && (
-        <div className={styles.fabWrap}>
-          <div className={styles.fabComplete}>Album complete 🎉</div>
-        </div>
-      )}
 
       </div>{/* end albumColumn */}
 
