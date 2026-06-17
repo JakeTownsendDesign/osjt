@@ -39,7 +39,7 @@
 }
 
 .tabActive {
-  color: #ff5c39;
+  color: #f6339a;
   font-weight: 600;
 }
 
@@ -47,7 +47,7 @@
   position: absolute;
   bottom: -1px;
   height: 2px;
-  background: #ff5c39;
+  background: #f6339a;
   border-radius: 2px;
   transition: left 0.2s ease;
 }
@@ -85,7 +85,7 @@
 }
 
 .emptyLink {
-  color: #ff5c39;
+  color: #f6339a;
   font-weight: 600;
   text-decoration: none;
 }
@@ -117,7 +117,7 @@
 .rank {
   font-size: 13px;
   font-weight: 700;
-  color: #ff5c39;
+  color: #f6339a;
   min-width: 24px;
 }
 
@@ -289,8 +289,8 @@
   height: 32px;
   padding: 0 16px;
   border-radius: 20px;
-  border: 1.5px solid #ff5c39;
-  background: #ff5c39;
+  border: 1.5px solid #f6339a;
+  background: #f6339a;
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
@@ -301,7 +301,7 @@
 
 .followingBtn {
   background: transparent;
-  color: #ff5c39;
+  color: #f6339a;
 }
 
 .followBtn:disabled {

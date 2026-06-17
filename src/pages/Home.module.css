@@ -36,7 +36,7 @@
 /* Today banner */
 .todayBanner {
   margin: 0 20px;
-  background: #ffe7df;
+  background: #fde8f3;
   border-radius: 16px;
   padding: 16px;
   display: flex;
@@ -48,7 +48,7 @@
 .todayIcon {
   width: 40px;
   height: 40px;
-  background: #ff5c39;
+  background: #f6339a;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -75,7 +75,7 @@
 
 .todayArrow {
   font-size: 20px;
-  color: #ff5c39;
+  color: #f6339a;
   font-weight: 600;
 }
 
@@ -100,7 +100,7 @@
 .seedLink {
   background: none;
   border: none;
-  color: #ff5c39;
+  color: #f6339a;
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
@@ -200,7 +200,7 @@
 
 .progressFill {
   height: 100%;
-  background: #ff5c39;
+  background: #f6339a;
   border-radius: 3px;
   transition: width 0.3s ease;
 }

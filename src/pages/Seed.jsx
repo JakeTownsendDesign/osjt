@@ -6,7 +6,7 @@ import styles from './Auth.module.css'
 import seedStyles from './Seed.module.css'
 
 const SEED_USERS = [
-  { id: 'user-alice', displayName: 'Alice Johnson', username: 'alice',   avatarColor: '#ff5c39', bio: 'Lover of golden hour and espresso.' },
+  { id: 'user-alice', displayName: 'Alice Johnson', username: 'alice',   avatarColor: '#f6339a', bio: 'Lover of golden hour and espresso.' },
   { id: 'user-bob',   displayName: 'Bob Smith',     username: 'bobsmith', avatarColor: '#4a90d9', bio: 'Street photographer based in London.' },
   { id: 'user-carol', displayName: 'Carol White',   username: 'carol_w',  avatarColor: '#50c878', bio: 'Chasing light around the world.' },
   { id: 'user-dave',  displayName: 'Dave Lee',      username: 'davelee',  avatarColor: '#9b59b6', bio: '' },
@@ -156,7 +156,7 @@ export default function Seed() {
         displayName:     currentUser.displayName || '',
         username:        derivedUsername,
         bio:             '',
-        avatarColor:     '#ff5c39',
+        avatarColor:     '#f6339a',
         avatarURL:       currentUser.photoURL || null,
         usernameChanged: false,
         createdAt:       serverTimestamp(),

@@ -88,7 +88,7 @@
 .remaining {
   font-size: 13px;
   font-weight: 500;
-  color: #ff5c39;
+  color: #f6339a;
 }
 
 .progressTrack {
@@ -100,7 +100,7 @@
 
 .progressFill {
   height: 100%;
-  background: #ff5c39;
+  background: #f6339a;
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -232,7 +232,7 @@
 }
 
 .tileLikeBtnActive {
-  background: rgba(255, 92, 57, 0.7);
+  background: rgba(246, 51, 154, 0.7);
 }
 
 .tileLikeCount {
@@ -269,14 +269,14 @@
   justify-content: center;
   height: 54px;
   padding: 0 32px;
-  background: #ff5c39;
+  background: #f6339a;
   color: #ffffff;
   font-size: 16px;
   font-weight: 600;
   font-family: inherit;
   border-radius: 27px;
   text-decoration: none;
-  box-shadow: 0 8px 20px rgba(255, 92, 57, 0.4);
+  box-shadow: 0 8px 20px rgba(246, 51, 154, 0.4);
   transition: opacity 0.15s;
 }
 
@@ -415,12 +415,12 @@
 
 .modalInput:focus,
 .modalTextarea:focus {
-  border-color: #ff5c39;
+  border-color: #f6339a;
 }
 
 .modalSaveBtn {
   height: 52px;
-  background: #ff5c39;
+  background: #f6339a;
   color: #ffffff;
   font-size: 16px;
   font-weight: 600;

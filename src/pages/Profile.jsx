@@ -79,7 +79,7 @@ export default function Profile() {
           username: '',
           bio: '',
           avatarURL: user.photoURL || null,
-          avatarColor: '#ff5c39',
+          avatarColor: '#f6339a',
           usernameChanged: false,
         }
         setProfile(fallback)
@@ -208,7 +208,7 @@ export default function Profile() {
         username: username || '',
         bio,
         avatarURL,
-        avatarColor: profile?.avatarColor || '#ff5c39',
+        avatarColor: profile?.avatarColor || '#f6339a',
         usernameChanged: newUsernameChanged,
         updatedAt: serverTimestamp(),
       }, { merge: true })
@@ -284,7 +284,7 @@ export default function Profile() {
           {avatarPreview
             ? <img src={avatarPreview} alt="Profile" className={styles.avatarImg} />
             : (
-              <div className={styles.avatarPlaceholder} style={{ background: profile?.avatarColor || '#ff5c39' }}>
+              <div className={styles.avatarPlaceholder} style={{ background: profile?.avatarColor || '#f6339a' }}>
                 {initials}
               </div>
             )
@@ -446,7 +446,7 @@ function CameraIcon() {
   return (
     <svg width="14" height="12" viewBox="0 0 14 12" fill="none">
       <path d="M5 1l1-1h2l1 1h3a1 1 0 011 1v8a1 1 0 01-1 1H1a1 1 0 01-1-1V2a1 1 0 011-1h4z" fill="white" />
-      <circle cx="7" cy="6.5" r="2" fill="#ff5c39" />
+      <circle cx="7" cy="6.5" r="2" fill="#f6339a" />
     </svg>
   )
 }
