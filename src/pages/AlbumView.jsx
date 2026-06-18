@@ -169,6 +169,18 @@ export default function AlbumView() {
     alert('Report submitted. Thank you.')
   }
 
+  // ── Report album ──
+  async function handleReportAlbum() {
+    setShowAlbumMenu(false)
+    await setDoc(doc(db, 'reports', `album-${albumId}__${user.uid}`), {
+      albumId,
+      reportedBy: user.uid,
+      type: 'album',
+      createdAt: serverTimestamp(),
+    })
+    alert('Report submitted. Thank you.')
+  }
+
   // ── Edit album ──
   async function handleSaveEdit(e) {
     e.preventDefault()
@@ -213,9 +225,7 @@ export default function AlbumView() {
       {/* Header */}
       <header className={styles.header}>
         <button className={styles.backBtn} onClick={() => navigate(-1)}>‹</button>
-        {isCreator && (
-          <button className={styles.menuBtn} onClick={() => setShowAlbumMenu(true)}>•••</button>
-        )}
+        <button className={styles.menuBtn} onClick={() => setShowAlbumMenu(true)}>•••</button>
       </header>
 
       {/* Title + description + submit CTA */}
@@ -292,15 +302,23 @@ export default function AlbumView() {
 
       </div>{/* end layout */}
 
-      {/* Album creator menu sheet */}
+      {/* Album menu sheet — owner sees manage actions, others see report */}
       {showAlbumMenu && (
         <BottomSheet onClose={() => setShowAlbumMenu(false)}>
-          <button className={styles.sheetBtn} onClick={() => { setShowAlbumMenu(false); setShowEditModal(true) }}>
-            Edit title &amp; description
-          </button>
-          <button className={`${styles.sheetBtn} ${styles.sheetBtnDestructive}`} onClick={() => setShowAlbumMenu(false)}>
-            Delete album
-          </button>
+          {isCreator ? (
+            <>
+              <button className={styles.sheetBtn} onClick={() => { setShowAlbumMenu(false); setShowEditModal(true) }}>
+                Edit title &amp; description
+              </button>
+              <button className={`${styles.sheetBtn} ${styles.sheetBtnDestructive}`} onClick={() => setShowAlbumMenu(false)}>
+                Delete album
+              </button>
+            </>
+          ) : (
+            <button className={`${styles.sheetBtn} ${styles.sheetBtnDestructive}`} onClick={handleReportAlbum}>
+              Report album
+            </button>
+          )}
         </BottomSheet>
       )}
 
