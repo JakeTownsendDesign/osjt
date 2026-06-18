@@ -1,20 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   collection, query, where, getDocs,
   doc, setDoc, serverTimestamp, Timestamp,
 } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import { useNavigate, Link } from 'react-router-dom'
+import { uploadImage, validateImage } from '../lib/upload'
 import styles from './CreateAlbum.module.css'
 
 const MIN_PHOTOS = 10
 const MAX_PHOTOS = 200
 const DEFAULT_PHOTOS = 100
 const STEP = 10
+const MAX_STARTER_PHOTOS = 3
 
 export default function CreateAlbum() {
   const navigate = useNavigate()
   const user = auth.currentUser
+  const photoInputRef = useRef(null)
 
   const [slotUsed, setSlotUsed] = useState(null)
   const [existingAlbum, setExistingAlbum] = useState(null)
@@ -22,6 +25,7 @@ export default function CreateAlbum() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [maxPhotos, setMaxPhotos] = useState(DEFAULT_PHOTOS)
+  const [photos, setPhotos] = useState([]) // [{ file, preview }]
 
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState({})
@@ -55,10 +59,29 @@ export default function CreateAlbum() {
   function decrement() { setMaxPhotos((v) => Math.max(MIN_PHOTOS, v - STEP)) }
   function increment() { setMaxPhotos((v) => Math.min(MAX_PHOTOS, v + STEP)) }
 
+  function handleAddPhotos(e) {
+    const files = Array.from(e.target.files || [])
+    e.target.value = '' // allow re-selecting the same file
+    for (const file of files) {
+      if (photos.length >= MAX_STARTER_PHOTOS) break
+      const err = validateImage(file)
+      if (err) { setErrors((er) => ({ ...er, photos: err })); continue }
+      setPhotos((prev) => prev.length < MAX_STARTER_PHOTOS
+        ? [...prev, { file, preview: URL.createObjectURL(file) }]
+        : prev)
+    }
+    setErrors((er) => ({ ...er, photos: null }))
+  }
+
+  function removePhoto(index) {
+    setPhotos((prev) => prev.filter((_, i) => i !== index))
+  }
+
   function validate() {
     const e = {}
     if (!title.trim()) e.title = 'Album title is required.'
     if (!description.trim()) e.description = 'Theme / description is required.'
+    if (photos.length < 1) e.photos = 'Add at least one photo to start your album.'
     return e
   }
 
@@ -68,24 +91,52 @@ export default function CreateAlbum() {
     setSaving(true)
     try {
       const id = `album-${user.uid}-${Date.now()}`
+
+      // 1. Upload the starter photos
+      const uploaded = []
+      for (let i = 0; i < photos.length; i++) {
+        const postId = `post-${id}-${i}`
+        const imageURL = await uploadImage(photos[i].file, `posts/${id}/${postId}`)
+        uploaded.push({ postId, imageURL })
+      }
+
+      const photoCount = uploaded.length
+      const thumbnailURLs = uploaded.slice(0, 4).map((u) => u.imageURL)
+
+      // 2. Create the album with accurate counts
       await setDoc(doc(db, 'albums', id), {
         title: title.trim(),
         description: description.trim(),
         maxPhotos,
-        photoCount: 0,
-        contributorCount: 0,
+        photoCount,
+        contributorCount: 1,
         likeCount: 0,
         commentCount: 0,
-        score: 0,
+        score: photoCount * 3,
         thumbnailColors: [],
-        status: 'open',
+        thumbnailURLs,
+        status: photoCount >= maxPhotos ? 'complete' : 'open',
         createdBy: user.uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       })
+
+      // 3. Create the post docs
+      for (const u of uploaded) {
+        await setDoc(doc(db, 'posts', u.postId), {
+          albumId: id,
+          createdBy: user.uid,
+          imageURL: u.imageURL,
+          placeholderColor: '#e8dccb',
+          caption: '',
+          likeCount: 0,
+          createdAt: serverTimestamp(),
+        })
+      }
+
       navigate(`/albums/${id}`)
-    } catch {
-      setErrors({ submit: 'Something went wrong. Please try again.' })
+    } catch (err) {
+      setErrors({ submit: err.message || 'Something went wrong. Please try again.' })
     } finally {
       setSaving(false)
     }
@@ -180,6 +231,34 @@ export default function CreateAlbum() {
             </div>
           </div>
           <p className={styles.hint}>Max 200. This can't be changed after creating.</p>
+        </div>
+
+        {/* Starter photos */}
+        <div className={styles.field}>
+          <label className={styles.label}>PHOTOS ({photos.length}/{MAX_STARTER_PHOTOS})</label>
+          <div className={styles.photoRow}>
+            {photos.map((p, i) => (
+              <div key={i} className={styles.photoThumb}>
+                <img src={p.preview} alt="" className={styles.photoThumbImg} />
+                <button type="button" className={styles.photoRemove} onClick={() => removePhoto(i)} aria-label="Remove">×</button>
+              </div>
+            ))}
+            {photos.length < MAX_STARTER_PHOTOS && (
+              <button type="button" className={styles.photoAdd} onClick={() => photoInputRef.current?.click()}>
+                +
+              </button>
+            )}
+          </div>
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            style={{ display: 'none' }}
+            onChange={handleAddPhotos}
+          />
+          <p className={styles.hint}>Add 1–3 photos to start your album. At least one is required.</p>
+          {errors.photos && <p className={styles.fieldError}>{errors.photos}</p>}
         </div>
 
         {/* Public album row */}

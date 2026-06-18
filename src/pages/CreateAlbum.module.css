@@ -296,3 +296,62 @@
   .form { padding: 0 48px 48px; }
   .slotUsedContainer { padding: 0 48px 48px; }
 }
+
+/* Starter photo picker */
+.photoRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.photoThumb {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.photoThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photoRemove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.6);
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photoAdd {
+  width: 88px;
+  height: 88px;
+  border-radius: 12px;
+  border: 2px dashed #ececec;
+  background: #faf7f2;
+  color: #f6339a;
+  font-size: 28px;
+  font-weight: 300;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.photoAdd:hover {
+  border-color: #f6339a;
+}

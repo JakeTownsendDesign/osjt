@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import CommentSection from '../components/CommentSection'
 import {
@@ -6,12 +6,15 @@ import {
   getDocs, setDoc, deleteDoc, updateDoc, increment, serverTimestamp,
 } from 'firebase/firestore'
 import { auth, db } from '../firebase'
+import { useUser, remainingContributions } from '../context/UserContext'
+import { uploadImage, validateImage, nextDailyContrib } from '../lib/upload'
 import styles from './AlbumView.module.css'
 
 export default function AlbumView() {
   const { albumId } = useParams()
   const navigate = useNavigate()
   const user = auth.currentUser
+  const { profile, setProfile } = useUser()
 
   const [album, setAlbum] = useState(null)
   const [posts, setPosts] = useState([])
@@ -20,6 +23,16 @@ export default function AlbumView() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [notFound, setNotFound] = useState(false)
+
+  // Upload / daily-limit state
+  const [showUpload, setShowUpload] = useState(false)
+  const [showLimitModal, setShowLimitModal] = useState(false)
+  const uploadFileRef = useRef(null)
+  const [uploadFile, setUploadFile] = useState(null)
+  const [uploadPreview, setUploadPreview] = useState(null)
+  const [uploadCaption, setUploadCaption] = useState('')
+  const [uploadError, setUploadError] = useState('')
+  const [uploading, setUploading] = useState(false)
 
   // Menu state
   const [showAlbumMenu, setShowAlbumMenu] = useState(false)
@@ -169,6 +182,95 @@ export default function AlbumView() {
     alert('Report submitted. Thank you.')
   }
 
+  // ── Contribute photo ──
+  function openUpload() {
+    setUploadError('')
+    setUploadFile(null)
+    setUploadPreview(null)
+    setUploadCaption('')
+    setShowUpload(true)
+  }
+
+  function handleUploadFile(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const err = validateImage(file)
+    if (err) { setUploadError(err); return }
+    setUploadError('')
+    setUploadFile(file)
+    setUploadPreview(URL.createObjectURL(file))
+  }
+
+  async function submitUpload() {
+    if (!uploadFile || uploading) return
+    // Re-check the limit at submit time using the live profile
+    if (remainingContributions(profile) <= 0) {
+      setShowUpload(false)
+      setShowLimitModal(true)
+      return
+    }
+    setUploading(true)
+    setUploadError('')
+    try {
+      const postId = `post-${albumId}-${user.uid}-${Date.now()}`
+      const imageURL = await uploadImage(uploadFile, `posts/${albumId}/${postId}`)
+
+      // 1. Create the post
+      await setDoc(doc(db, 'posts', postId), {
+        albumId,
+        createdBy: user.uid,
+        imageURL,
+        placeholderColor: '#e8dccb',
+        caption: uploadCaption.trim(),
+        likeCount: 0,
+        createdAt: serverTimestamp(),
+      })
+
+      // 2. Update album counters (score = photoCount*3 + likeCount*2 + commentCount)
+      const albumUpdate = {
+        photoCount: increment(1),
+        score: increment(3),
+        updatedAt: serverTimestamp(),
+      }
+      // Keep up to 4 thumbnails on the album for card previews
+      const currentThumbs = album.thumbnailURLs || []
+      if (currentThumbs.length < 4) {
+        albumUpdate.thumbnailURLs = [...currentThumbs, imageURL]
+      }
+      // Auto-lock when the album reaches capacity (ALBUM-03)
+      const willBeComplete = (album.photoCount || 0) + 1 >= album.maxPhotos
+      if (willBeComplete) albumUpdate.status = 'complete'
+      await updateDoc(doc(db, 'albums', albumId), albumUpdate)
+
+      // 3. Bump the user's daily contribution counter (no extra read)
+      const dc = nextDailyContrib(profile)
+      await setDoc(doc(db, 'users', user.uid), { dailyContrib: dc }, { merge: true })
+      setProfile((p) => ({ ...(p || {}), dailyContrib: dc }))
+
+      // 4. Reflect locally
+      const newPost = {
+        id: postId, albumId, createdBy: user.uid, imageURL,
+        placeholderColor: '#e8dccb', caption: uploadCaption.trim(),
+        likeCount: 0, createdAt: { seconds: Math.floor(Date.now() / 1000) },
+      }
+      setPosts((prev) => [...prev, newPost])
+      setAlbum((a) => ({
+        ...a,
+        photoCount: (a.photoCount || 0) + 1,
+        thumbnailURLs: currentThumbs.length < 4 ? [...currentThumbs, imageURL] : currentThumbs,
+        status: willBeComplete ? 'complete' : a.status,
+      }))
+      if (!contributors[user.uid] && profile) {
+        setContributors((m) => ({ ...m, [user.uid]: profile }))
+      }
+      setShowUpload(false)
+    } catch (err) {
+      setUploadError(err.message || 'Upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   // ── Report album ──
   async function handleReportAlbum() {
     setShowAlbumMenu(false)
@@ -216,6 +318,8 @@ export default function AlbumView() {
   const remaining = album.maxPhotos - (album.photoCount || 0)
   const progress = album.maxPhotos > 0 ? Math.min((album.photoCount || 0) / album.maxPhotos, 1) : 0
   const contributorList = Object.values(contributors).slice(0, 5)
+  const dailyRemaining = remainingContributions(profile)
+  const atDailyLimit = dailyRemaining <= 0
 
   return (
     <div className={styles.screen}>
@@ -232,13 +336,18 @@ export default function AlbumView() {
       <div className={styles.titleSection}>
         <div className={styles.titleRow}>
           <h1 className={styles.albumTitle}>{album.title}</h1>
-          {album.status !== 'complete' && (
-            <Link to={`/upload?albumId=${albumId}`} className={styles.submitBtn}>
-              + Submit photo
-            </Link>
-          )}
-          {album.status === 'complete' && (
+          {album.status === 'complete' ? (
             <span className={styles.completeTag}>Complete 🎉</span>
+          ) : (
+            // Owner does not see the submit button (they add photos at creation)
+            !isCreator && (
+              <button
+                className={`${styles.submitBtn} ${atDailyLimit ? styles.submitBtnDisabled : ''}`}
+                onClick={() => (atDailyLimit ? setShowLimitModal(true) : openUpload())}
+              >
+                + Submit photo
+              </button>
+            )
           )}
         </div>
         <p className={styles.albumDesc}>{album.description}</p>
@@ -372,6 +481,67 @@ export default function AlbumView() {
                 Cancel
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Upload photo modal */}
+      {showUpload && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <h2 className={styles.modalTitle}>Submit a photo</h2>
+            <p className={styles.uploadHint}>
+              {dailyRemaining} of 3 daily contribution{dailyRemaining === 1 ? '' : 's'} left
+            </p>
+
+            <button
+              type="button"
+              className={styles.uploadDrop}
+              onClick={() => uploadFileRef.current?.click()}
+            >
+              {uploadPreview
+                ? <img src={uploadPreview} alt="Preview" className={styles.uploadPreview} />
+                : <span className={styles.uploadDropText}>+ Choose a photo</span>}
+            </button>
+            <input
+              ref={uploadFileRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleUploadFile}
+            />
+
+            <textarea
+              className={styles.modalTextarea}
+              placeholder="Add a caption… (optional)"
+              value={uploadCaption}
+              onChange={(e) => setUploadCaption(e.target.value)}
+              maxLength={200}
+              rows={2}
+            />
+
+            {uploadError && <p className={styles.uploadError}>{uploadError}</p>}
+
+            <button className={styles.modalSaveBtn} onClick={submitUpload} disabled={!uploadFile || uploading}>
+              {uploading ? 'Uploading…' : 'Share photo'}
+            </button>
+            <button type="button" className={styles.modalCancelBtn} onClick={() => setShowUpload(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Daily limit modal */}
+      {showLimitModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.limitIcon}>📸</div>
+            <h2 className={styles.modalTitle}>Daily limit reached</h2>
+            <p className={styles.limitText}>Come back tomorrow to share more.</p>
+            <button className={styles.modalSaveBtn} onClick={() => setShowLimitModal(false)}>
+              Confirm
+            </button>
           </div>
         </div>
       )}
