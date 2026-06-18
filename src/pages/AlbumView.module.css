@@ -504,6 +504,7 @@
 }
 
 .modalSaveBtn {
+  width: 100%;
   height: 52px;
   background: #f6339a;
   color: #ffffff;
@@ -513,13 +514,19 @@
   border: none;
   border-radius: 14px;
   cursor: pointer;
+  transition: opacity 0.15s;
 }
+
+.modalSaveBtn:hover:not(:disabled) { opacity: 0.9; }
+.modalSaveBtn:active:not(:disabled) { opacity: 0.8; }
 
 .modalSaveBtn:disabled {
   opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .modalCancelBtn {
+  width: 100%;
   background: none;
   border: none;
   font-size: 15px;
@@ -553,17 +560,16 @@
   .tile:hover .tileOverlay { opacity: 1; }
 }
 
-/* Upload modal */
+/* Upload modal — spacing handled by .modalForm gap */
 .uploadHint {
   font-size: 13px;
   color: #8a8a93;
-  margin-bottom: 16px;
 }
 
 .uploadDrop {
   width: 100%;
   aspect-ratio: 1;
-  max-height: 280px;
+  max-height: 260px;
   border: 2px dashed #ececec;
   border-radius: 14px;
   background: #faf7f2;
@@ -573,7 +579,6 @@
   cursor: pointer;
   overflow: hidden;
   padding: 0;
-  margin-bottom: 14px;
   transition: border-color 0.15s;
 }
 
@@ -599,7 +604,11 @@
   font-size: 13px;
   color: #e53935;
   font-weight: 500;
-  margin-bottom: 10px;
+}
+
+/* Slight breathing room above the action buttons inside the upload form */
+.modalForm .modalSaveBtn {
+  margin-top: 4px;
 }
 
 /* Daily limit modal */

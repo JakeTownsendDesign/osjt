@@ -491,44 +491,47 @@ export default function AlbumView() {
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
             <h2 className={styles.modalTitle}>Submit a photo</h2>
-            <p className={styles.uploadHint}>
-              {dailyRemaining} of 3 daily contribution{dailyRemaining === 1 ? '' : 's'} left
-            </p>
 
-            <button
-              type="button"
-              className={styles.uploadDrop}
-              onClick={() => uploadFileRef.current?.click()}
-            >
-              {uploadPreview
-                ? <img src={uploadPreview} alt="Preview" className={styles.uploadPreview} />
-                : <span className={styles.uploadDropText}>+ Choose a photo</span>}
-            </button>
-            <input
-              ref={uploadFileRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleUploadFile}
-            />
+            <div className={styles.modalForm}>
+              <p className={styles.uploadHint}>
+                {dailyRemaining} of 3 daily contribution{dailyRemaining === 1 ? '' : 's'} left
+              </p>
 
-            <textarea
-              className={styles.modalTextarea}
-              placeholder="Add a caption… (optional)"
-              value={uploadCaption}
-              onChange={(e) => setUploadCaption(e.target.value)}
-              maxLength={200}
-              rows={2}
-            />
+              <button
+                type="button"
+                className={styles.uploadDrop}
+                onClick={() => uploadFileRef.current?.click()}
+              >
+                {uploadPreview
+                  ? <img src={uploadPreview} alt="Preview" className={styles.uploadPreview} />
+                  : <span className={styles.uploadDropText}>+ Choose a photo</span>}
+              </button>
+              <input
+                ref={uploadFileRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleUploadFile}
+              />
 
-            {uploadError && <p className={styles.uploadError}>{uploadError}</p>}
+              <textarea
+                className={styles.modalTextarea}
+                placeholder="Add a caption… (optional)"
+                value={uploadCaption}
+                onChange={(e) => setUploadCaption(e.target.value)}
+                maxLength={200}
+                rows={2}
+              />
 
-            <button className={styles.modalSaveBtn} onClick={submitUpload} disabled={!uploadFile || uploading}>
-              {uploading ? 'Uploading…' : 'Share photo'}
-            </button>
-            <button type="button" className={styles.modalCancelBtn} onClick={() => setShowUpload(false)}>
-              Cancel
-            </button>
+              {uploadError && <p className={styles.uploadError}>{uploadError}</p>}
+
+              <button className={styles.modalSaveBtn} onClick={submitUpload} disabled={!uploadFile || uploading}>
+                {uploading ? 'Uploading…' : 'Share photo'}
+              </button>
+              <button type="button" className={styles.modalCancelBtn} onClick={() => setShowUpload(false)}>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
