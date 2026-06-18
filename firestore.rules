@@ -1,0 +1,133 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function uid() {
+      return request.auth.uid;
+    }
+
+    // Today's date as YYYY-MM-DD, derived from the server clock (request.time)
+    function todayStr() {
+      return string(request.time.year()) + '-'
+        + (request.time.month() < 10 ? '0' : '') + string(request.time.month()) + '-'
+        + (request.time.day() < 10 ? '0' : '') + string(request.time.day());
+    }
+
+    function albumOwner(albumId) {
+      return get(/databases/$(database)/documents/albums/$(albumId)).data.createdBy;
+    }
+
+    // Validate the daily contribution counter for a post in a NON-owned album.
+    // The post create must be accompanied (same batched write) by an update to
+    // users/{uid}.dailyContrib that increments today's count and stays <= 3.
+    function withinDailyLimit() {
+      let beforeData = get(/databases/$(database)/documents/users/$(uid())).data;
+      let startedToday = 'dailyContrib' in beforeData
+        && beforeData.dailyContrib.date == todayStr();
+      let after = getAfter(/databases/$(database)/documents/users/$(uid())).data.dailyContrib;
+      return after.date == todayStr()
+        && after.count is int
+        && after.count >= 1
+        && after.count <= 3
+        && (startedToday
+              ? after.count == beforeData.dailyContrib.count + 1
+              : after.count == 1);
+    }
+
+    // ── users ────────────────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      // A user may only create/update their own profile doc (incl. dailyContrib)
+      allow create, update: if isSignedIn() && userId == uid();
+      allow delete: if false;
+    }
+
+    // ── usernames (reservations) ───────────────────────────────────────────
+    match /usernames/{username} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // ── albums ─────────────────────────────────────────────────────────────
+    match /albums/{albumId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.createdBy == uid();
+      // Updates (photoCount, score, likeCount, commentCount, thumbnails, status)
+      // happen from contributors and engagement actions — any signed-in user.
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn() && resource.data.createdBy == uid();
+    }
+
+    // ── posts ──────────────────────────────────────────────────────────────
+    match /posts/{postId} {
+      allow read: if isSignedIn();
+
+      // Create: own album → always allowed. Other albums → daily limit enforced.
+      allow create: if isSignedIn()
+        && request.resource.data.createdBy == uid()
+        && (
+          albumOwner(request.resource.data.albumId) == uid()
+          || withinDailyLimit()
+        );
+
+      // Like counts / caption edits etc.
+      allow update: if isSignedIn();
+
+      // Post owner or the album owner may delete
+      allow delete: if isSignedIn() && (
+        resource.data.createdBy == uid()
+        || albumOwner(resource.data.albumId) == uid()
+      );
+    }
+
+    // ── likes (one per post per user) ───────────────────────────────────────
+    match /likes/{likeId} {
+      allow read: if isSignedIn();
+      allow create, delete: if isSignedIn() && request.auth != null
+        && (request.resource == null || request.resource.data.userId == uid()
+            || resource.data.userId == uid());
+    }
+
+    // ── comments ─────────────────────────────────────────────────────────────
+    match /comments/{commentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.createdBy == uid();
+      allow update: if isSignedIn(); // likeCount increments
+      // Comment owner or the album owner may delete
+      allow delete: if isSignedIn() && (
+        resource.data.createdBy == uid()
+        || albumOwner(resource.data.albumId) == uid()
+      );
+    }
+
+    // ── commentLikes ─────────────────────────────────────────────────────────
+    match /commentLikes/{id} {
+      allow read: if isSignedIn();
+      allow create, delete: if isSignedIn();
+    }
+
+    // ── follows ──────────────────────────────────────────────────────────────
+    match /follows/{id} {
+      allow read: if isSignedIn();
+      // A user may only create/remove their own follow edges
+      allow create: if isSignedIn() && request.resource.data.followerId == uid();
+      allow delete: if isSignedIn() && resource.data.followerId == uid();
+    }
+
+    // ── reports ──────────────────────────────────────────────────────────────
+    match /reports/{id} {
+      allow read: if false; // admin-only, via console for now
+      allow create: if isSignedIn() && request.resource.data.reportedBy == uid();
+    }
+
+    // ── seed pre-flight ping ──────────────────────────────────────────────────
+    match /_ping/{id} {
+      allow read, write: if isSignedIn();
+    }
+  }
+}

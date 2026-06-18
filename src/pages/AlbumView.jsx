@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import CommentSection from '../components/CommentSection'
 import {
   doc, getDoc, collection, query, where,
-  getDocs, setDoc, deleteDoc, updateDoc, increment, serverTimestamp,
+  getDocs, setDoc, deleteDoc, updateDoc, increment, serverTimestamp, writeBatch,
 } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import { useUser, remainingContributions } from '../context/UserContext'
@@ -215,8 +215,25 @@ export default function AlbumView() {
       const postId = `post-${albumId}-${user.uid}-${Date.now()}`
       const imageURL = await uploadImage(uploadFile, `posts/${albumId}/${postId}`)
 
-      // 1. Create the post
-      await setDoc(doc(db, 'posts', postId), {
+      // Album counter update
+      const albumUpdate = {
+        photoCount: increment(1),
+        score: increment(3),
+        updatedAt: serverTimestamp(),
+      }
+      const currentThumbs = album.thumbnailURLs || []
+      if (currentThumbs.length < 4) {
+        albumUpdate.thumbnailURLs = [...currentThumbs, imageURL]
+      }
+      // Auto-lock when the album reaches capacity (ALBUM-03)
+      const willBeComplete = (album.photoCount || 0) + 1 >= album.maxPhotos
+      if (willBeComplete) albumUpdate.status = 'complete'
+
+      // The daily counter and the post MUST be written in the same atomic batch
+      // so the security rules' getAfter() can verify the increment is within limit.
+      const dc = nextDailyContrib(profile)
+      const batch = writeBatch(db)
+      batch.set(doc(db, 'posts', postId), {
         albumId,
         createdBy: user.uid,
         imageURL,
@@ -225,26 +242,10 @@ export default function AlbumView() {
         likeCount: 0,
         createdAt: serverTimestamp(),
       })
+      batch.update(doc(db, 'albums', albumId), albumUpdate)
+      batch.set(doc(db, 'users', user.uid), { dailyContrib: dc }, { merge: true })
+      await batch.commit()
 
-      // 2. Update album counters (score = photoCount*3 + likeCount*2 + commentCount)
-      const albumUpdate = {
-        photoCount: increment(1),
-        score: increment(3),
-        updatedAt: serverTimestamp(),
-      }
-      // Keep up to 4 thumbnails on the album for card previews
-      const currentThumbs = album.thumbnailURLs || []
-      if (currentThumbs.length < 4) {
-        albumUpdate.thumbnailURLs = [...currentThumbs, imageURL]
-      }
-      // Auto-lock when the album reaches capacity (ALBUM-03)
-      const willBeComplete = (album.photoCount || 0) + 1 >= album.maxPhotos
-      if (willBeComplete) albumUpdate.status = 'complete'
-      await updateDoc(doc(db, 'albums', albumId), albumUpdate)
-
-      // 3. Bump the user's daily contribution counter (no extra read)
-      const dc = nextDailyContrib(profile)
-      await setDoc(doc(db, 'users', user.uid), { dailyContrib: dc }, { merge: true })
       setProfile((p) => ({ ...(p || {}), dailyContrib: dc }))
 
       // 4. Reflect locally
