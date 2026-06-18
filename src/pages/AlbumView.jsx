@@ -203,7 +203,12 @@ export default function AlbumView() {
 
   async function submitUpload() {
     if (!uploadFile || uploading) return
-    // Re-check the limit at submit time using the live profile
+    // Album is at capacity — no more photos can be added right now
+    if ((album.photoCount || 0) >= album.maxPhotos) {
+      setShowUpload(false)
+      return
+    }
+    // Re-check the daily limit at submit time using the live profile
     if (remainingContributions(profile) <= 0) {
       setShowUpload(false)
       setShowLimitModal(true)
@@ -225,9 +230,6 @@ export default function AlbumView() {
       if (currentThumbs.length < 4) {
         albumUpdate.thumbnailURLs = [...currentThumbs, imageURL]
       }
-      // Auto-lock when the album reaches capacity (ALBUM-03)
-      const willBeComplete = (album.photoCount || 0) + 1 >= album.maxPhotos
-      if (willBeComplete) albumUpdate.status = 'complete'
 
       // The daily counter and the post MUST be written in the same atomic batch
       // so the security rules' getAfter() can verify the increment is within limit.
@@ -259,7 +261,6 @@ export default function AlbumView() {
         ...a,
         photoCount: (a.photoCount || 0) + 1,
         thumbnailURLs: currentThumbs.length < 4 ? [...currentThumbs, imageURL] : currentThumbs,
-        status: willBeComplete ? 'complete' : a.status,
       }))
       if (!contributors[user.uid] && profile) {
         setContributors((m) => ({ ...m, [user.uid]: profile }))
@@ -321,6 +322,7 @@ export default function AlbumView() {
   const contributorList = Object.values(contributors).slice(0, 5)
   const dailyRemaining = remainingContributions(profile)
   const atDailyLimit = dailyRemaining <= 0
+  const isFull = (album.photoCount || 0) >= album.maxPhotos
 
   return (
     <div className={styles.screen}>
@@ -337,8 +339,8 @@ export default function AlbumView() {
       <div className={styles.titleSection}>
         <div className={styles.titleRow}>
           <h1 className={styles.albumTitle}>{album.title}</h1>
-          {album.status === 'complete' ? (
-            <span className={styles.completeTag}>Complete 🎉</span>
+          {isFull ? (
+            <span className={styles.completeTag}>Album full</span>
           ) : (
             // Owner does not see the submit button (they add photos at creation)
             !isCreator && (

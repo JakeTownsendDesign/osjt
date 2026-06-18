@@ -27,6 +27,13 @@ service cloud.firestore {
       return request.resource.data.diff(resource.data).affectedKeys();
     }
 
+    // Album must not exceed its capacity after this write
+    function withinCapacity(albumId) {
+      let album = get(/databases/$(database)/documents/albums/$(albumId)).data;
+      let afterCount = getAfter(/databases/$(database)/documents/albums/$(albumId)).data.photoCount;
+      return afterCount <= album.maxPhotos;
+    }
+
     // Validate the daily contribution counter for a post in a NON-owned album.
     // The post create must be accompanied (same batched write) by an update to
     // users/{uid}.dailyContrib that increments today's count and stays <= 3.
@@ -78,9 +85,11 @@ service cloud.firestore {
     match /posts/{postId} {
       allow read: if isSignedIn();
 
-      // Create: own album → always allowed. Other albums → daily limit enforced.
+      // Create: never exceed album capacity. Own album → allowed; other
+      // albums → daily contribution limit enforced.
       allow create: if isSignedIn()
         && request.resource.data.createdBy == uid()
+        && withinCapacity(request.resource.data.albumId)
         && (
           albumOwner(request.resource.data.albumId) == uid()
           || withinDailyLimit()
