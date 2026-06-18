@@ -33,52 +33,6 @@
   justify-content: center;
 }
 
-/* Today banner */
-.todayBanner {
-  margin: 0 20px;
-  background: #fde8f3;
-  border-radius: 16px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  cursor: pointer;
-}
-
-.todayIcon {
-  width: 40px;
-  height: 40px;
-  background: #f6339a;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.todayText {
-  flex: 1;
-}
-
-.todayTitle {
-  font-size: 15px;
-  font-weight: 600;
-  color: #1b1b1f;
-}
-
-.todaySubtitle {
-  font-size: 13px;
-  font-weight: 400;
-  color: #8a8a93;
-  margin-top: 2px;
-}
-
-.todayArrow {
-  font-size: 20px;
-  color: #f6339a;
-  font-weight: 600;
-}
-
 /* Section */
 .section {
   padding: 24px 20px 0;
@@ -239,9 +193,6 @@
   .header {
     padding: 32px 32px 16px;
   }
-  .todayBanner {
-    margin: 0 32px;
-  }
   .section {
     padding: 24px 32px 0;
   }
@@ -250,9 +201,6 @@
 @media (min-width: 1200px) {
   .header {
     padding: 40px 48px 20px;
-  }
-  .todayBanner {
-    margin: 0 48px;
   }
   .section {
     padding: 28px 48px 0;

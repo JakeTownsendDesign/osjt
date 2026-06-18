@@ -48,17 +48,6 @@ export default function Home() {
         </button>
       </header>
 
-      <div className={styles.todayBanner}>
-        <div className={styles.todayIcon}>
-          <CameraIcon />
-        </div>
-        <div className={styles.todayText}>
-          <p className={styles.todayTitle}>Today's photo awaits</p>
-          <p className={styles.todaySubtitle}>You haven't posted yet today</p>
-        </div>
-        <span className={styles.todayArrow}>›</span>
-      </div>
-
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Recently updated</h2>
 
@@ -139,14 +128,5 @@ function AlbumCard({ album, poster, isCurrentUser }) {
         </div>
       </Link>
     </div>
-  )
-}
-
-function CameraIcon() {
-  return (
-    <svg width="22" height="18" viewBox="0 0 22 18" fill="none">
-      <path d="M8 2l1.5-2h3L14 2h4a2 2 0 012 2v12a2 2 0 01-2 2H2a2 2 0 01-2-2V4a2 2 0 012-2h6z" fill="white" />
-      <circle cx="11" cy="10" r="3.5" fill="#f6339a" />
-    </svg>
   )
 }
