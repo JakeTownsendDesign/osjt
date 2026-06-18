@@ -1,12 +1,20 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
-import { db } from '../firebase'
+import { auth, db } from '../firebase'
+import { useUser } from '../context/UserContext'
 import styles from './UserProfile.module.css'
 
 export default function UserProfile() {
-  const { uid } = useParams()
+  const { uid: paramUid } = useParams()
   const navigate = useNavigate()
+  const { profile: contextProfile } = useUser()
+  const currentUid = auth.currentUser?.uid
+
+  // /profile has no :uid param → it's the current user's own profile
+  const targetUid = paramUid || currentUid
+  const isOwn = targetUid === currentUid
+
   const [profile, setProfile] = useState(null)
   const [albums, setAlbums] = useState([])
   const [loading, setLoading] = useState(true)
@@ -14,7 +22,9 @@ export default function UserProfile() {
 
   useEffect(() => {
     async function load() {
-      const snap = await getDoc(doc(db, 'users', uid))
+      setLoading(true)
+      setNotFound(false)
+      const snap = await getDoc(doc(db, 'users', targetUid))
       if (!snap.exists()) {
         setNotFound(true)
         setLoading(false)
@@ -22,13 +32,13 @@ export default function UserProfile() {
       }
       setProfile(snap.data())
 
-      const q = query(collection(db, 'albums'), where('createdBy', '==', uid))
+      const q = query(collection(db, 'albums'), where('createdBy', '==', targetUid))
       const albumSnap = await getDocs(q)
       setAlbums(albumSnap.docs.map((d) => ({ id: d.id, ...d.data() })))
       setLoading(false)
     }
     load()
-  }, [uid])
+  }, [targetUid, contextProfile]) // re-run when own profile changes (after editing)
 
   if (loading) {
     return (
@@ -54,7 +64,9 @@ export default function UserProfile() {
   return (
     <div className={styles.screen}>
       <header className={styles.header}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)}>‹ Back</button>
+        {!isOwn && (
+          <button className={styles.backBtn} onClick={() => navigate(-1)}>‹ Back</button>
+        )}
       </header>
 
       <div className={styles.profileSection}>
@@ -67,6 +79,10 @@ export default function UserProfile() {
         <h1 className={styles.displayName}>{profile.displayName}</h1>
         <p className={styles.username}>@{profile.username}</p>
         {profile.bio ? <p className={styles.bio}>{profile.bio}</p> : null}
+
+        {isOwn && (
+          <Link to="/profile/edit" className={styles.editBtn}>Edit profile</Link>
+        )}
       </div>
 
       <div className={styles.albumsSection}>
@@ -94,7 +110,7 @@ function AlbumTile({ album }) {
   const urls = album.thumbnailURLs || []
 
   return (
-    <div className={styles.albumTile}>
+    <Link to={`/albums/${album.id}`} className={styles.albumTile} style={{ textDecoration: 'none' }}>
       <div className={styles.tileThumbRow}>
         {colors.slice(0, 4).map((c, i) => (
           <div key={i} className={styles.tileThumb} style={{ background: c }}>
@@ -104,6 +120,6 @@ function AlbumTile({ album }) {
       </div>
       <p className={styles.tileTitle}>{album.title}</p>
       <p className={styles.tileMeta}>{album.photoCount} / {album.maxPhotos} photos</p>
-    </div>
+    </Link>
   )
 }

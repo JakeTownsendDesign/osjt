@@ -12,6 +12,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { auth, db, storage } from '../firebase'
 import { signOut } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
+import { useUser } from '../context/UserContext'
 import styles from './Profile.module.css'
 
 // ─── Username helpers ────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ async function isUsernameAvailable(username, currentUid) {
 export default function Profile() {
   const navigate = useNavigate()
   const user = auth.currentUser
+  const { setProfile: setContextProfile } = useUser()
   const fileInputRef = useRef(null)
 
   // Firestore user data
@@ -224,6 +226,15 @@ export default function Profile() {
       setAvatarFile(null)
       setUsernameStatus(null)
       setSaveSuccess(true)
+
+      // Keep the app-wide user context in sync (nav avatar, profile view, etc.)
+      setContextProfile((p) => ({ ...(p || {}), username, bio, avatarURL, usernameChanged: newUsernameChanged }))
+
+      // Return to the profile view — unless we're mid email-verification flow,
+      // where we keep the user here to show the "check your inbox" message.
+      if (!(emailChanged && providedPassword)) {
+        navigate('/profile')
+      }
     } catch (err) {
       setSaveError(friendlyError(err.code, err.message) || err.message)
     } finally {
@@ -268,7 +279,8 @@ export default function Profile() {
     <div className={styles.screen}>
       {/* Header */}
       <header className={styles.header}>
-        <h1 className={styles.headerTitle}>Profile</h1>
+        <button className={styles.backBtn} onClick={() => navigate('/profile')} aria-label="Back">‹</button>
+        <h1 className={styles.headerTitle}>Edit profile</h1>
         <button
           className={styles.saveBtn}
           onClick={handleSave}

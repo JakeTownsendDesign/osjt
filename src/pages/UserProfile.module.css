@@ -80,6 +80,30 @@
   max-width: 280px;
 }
 
+.editBtn {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 24px;
+  border: 1.5px solid #ececec;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #1b1b1f;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.editBtn:hover {
+  border-color: #f6339a;
+  color: #f6339a;
+}
+
 .albumsSection {
   padding: 24px 20px 0;
 }

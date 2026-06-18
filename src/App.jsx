@@ -43,7 +43,8 @@ function AppRoutes() {
       <Route path="/verify-email" element={<LoggedInRoute><VerifyEmail /></LoggedInRoute>} />
       <Route path="/"             element={<ProtectedRoute><AppLayout><Home /></AppLayout></ProtectedRoute>} />
       <Route path="/explore"      element={<ProtectedRoute><AppLayout><Explore /></AppLayout></ProtectedRoute>} />
-      <Route path="/profile"      element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
+      <Route path="/profile"      element={<ProtectedRoute><AppLayout><UserProfile /></AppLayout></ProtectedRoute>} />
+      <Route path="/profile/edit" element={<ProtectedRoute><AppLayout><Profile /></AppLayout></ProtectedRoute>} />
       <Route path="/seed"         element={<ProtectedRoute><AppLayout><Seed /></AppLayout></ProtectedRoute>} />
       <Route path="/users/:uid"   element={<ProtectedRoute><AppLayout><UserProfile /></AppLayout></ProtectedRoute>} />
       <Route path="/create-album"    element={<ProtectedRoute><AppLayout><CreateAlbum /></AppLayout></ProtectedRoute>} />

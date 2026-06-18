@@ -1,8 +1,14 @@
 import { NavLink, useNavigate } from 'react-router-dom'
+import { useUser } from '../context/UserContext'
 import styles from './BottomNav.module.css'
 
 export default function BottomNav() {
   const navigate = useNavigate()
+  const { profile } = useUser()
+
+  const initials = profile?.displayName
+    ? profile.displayName.split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
+    : '?'
 
   return (
     <nav className={styles.nav}>
@@ -21,8 +27,16 @@ export default function BottomNav() {
       </button>
 
       <NavLink to="/profile" className={({ isActive }) => `${styles.tab} ${isActive ? styles.active : ''}`}>
-        <ProfileIcon />
-        <span>Profile</span>
+        {({ isActive }) => (
+          <>
+            <span className={`${styles.avatar} ${isActive ? styles.avatarActive : ''}`} style={{ background: profile?.avatarColor || '#b9b9c0' }}>
+              {profile?.avatarURL
+                ? <img src={profile.avatarURL} alt="" className={styles.avatarImg} />
+                : initials}
+            </span>
+            <span>Profile</span>
+          </>
+        )}
       </NavLink>
     </nav>
   )
@@ -43,15 +57,6 @@ function ExploreIcon() {
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
       <circle cx="9" cy="9" r="8" stroke="currentColor" strokeWidth="2" />
       <circle cx="9" cy="9" r="3" fill="currentColor" />
-    </svg>
-  )
-}
-
-function ProfileIcon() {
-  return (
-    <svg width="18" height="20" viewBox="0 0 18 20" fill="none">
-      <circle cx="9" cy="6" r="5" stroke="currentColor" strokeWidth="2" />
-      <path d="M1 19c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   )
 }
