@@ -22,6 +22,11 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/albums/$(albumId)).data.createdBy;
     }
 
+    // The set of fields changed by an update
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
     // Validate the daily contribution counter for a post in a NON-owned album.
     // The post create must be accompanied (same batched write) by an update to
     // users/{uid}.dailyContrib that increments today's count and stays <= 3.
@@ -57,9 +62,15 @@ service cloud.firestore {
     match /albums/{albumId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.createdBy == uid();
-      // Updates (photoCount, score, likeCount, commentCount, thumbnails, status)
-      // happen from contributors and engagement actions — any signed-in user.
-      allow update: if isSignedIn();
+      // Owner may edit anything. Anyone else may only touch the denormalised
+      // counter/preview fields (set when contributing, liking, commenting).
+      allow update: if isSignedIn() && (
+        resource.data.createdBy == uid()
+        || changedKeys().hasOnly([
+             'photoCount', 'score', 'likeCount', 'commentCount',
+             'contributorCount', 'thumbnailURLs', 'status', 'updatedAt'
+           ])
+      );
       allow delete: if isSignedIn() && resource.data.createdBy == uid();
     }
 
@@ -75,8 +86,11 @@ service cloud.firestore {
           || withinDailyLimit()
         );
 
-      // Like counts / caption edits etc.
-      allow update: if isSignedIn();
+      // Post owner may edit caption; anyone may change only the like count.
+      allow update: if isSignedIn() && (
+        resource.data.createdBy == uid()
+        || changedKeys().hasOnly(['likeCount'])
+      );
 
       // Post owner or the album owner may delete
       allow delete: if isSignedIn() && (
@@ -97,7 +111,8 @@ service cloud.firestore {
     match /comments/{commentId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.createdBy == uid();
-      allow update: if isSignedIn(); // likeCount increments
+      // Only the like count may change on an existing comment.
+      allow update: if isSignedIn() && changedKeys().hasOnly(['likeCount']);
       // Comment owner or the album owner may delete
       allow delete: if isSignedIn() && (
         resource.data.createdBy == uid()
