@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore'
+import {
+  doc, getDoc, setDoc, deleteDoc, collection, query, where, getDocs, serverTimestamp,
+} from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import { useUser } from '../context/UserContext'
 import styles from './UserProfile.module.css'
@@ -17,6 +19,10 @@ export default function UserProfile() {
 
   const [profile, setProfile] = useState(null)
   const [albums, setAlbums] = useState([])
+  const [followingCount, setFollowingCount] = useState(0)
+  const [followerCount, setFollowerCount] = useState(0)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [followBusy, setFollowBusy] = useState(false)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
 
@@ -35,10 +41,49 @@ export default function UserProfile() {
       const q = query(collection(db, 'albums'), where('createdBy', '==', targetUid))
       const albumSnap = await getDocs(q)
       setAlbums(albumSnap.docs.map((d) => ({ id: d.id, ...d.data() })))
+
+      // Follow stats: following = this user follows others, followers = others follow this user
+      const [followingSnap, followersSnap] = await Promise.all([
+        getDocs(query(collection(db, 'follows'), where('followerId', '==', targetUid))),
+        getDocs(query(collection(db, 'follows'), where('followeeId', '==', targetUid))),
+      ])
+      setFollowingCount(followingSnap.size)
+      setFollowerCount(followersSnap.size)
+      setIsFollowing(followersSnap.docs.some((d) => d.data().followerId === currentUid))
+
       setLoading(false)
     }
     load()
-  }, [targetUid, contextProfile]) // re-run when own profile changes (after editing)
+  }, [targetUid, contextProfile, currentUid]) // re-run when own profile changes (after editing)
+
+  async function toggleFollow() {
+    if (followBusy || isOwn) return
+    setFollowBusy(true)
+    const followId = `${currentUid}__${targetUid}`
+    const wasFollowing = isFollowing
+
+    // Optimistic update
+    setIsFollowing(!wasFollowing)
+    setFollowerCount((c) => c + (wasFollowing ? -1 : 1))
+
+    try {
+      if (wasFollowing) {
+        await deleteDoc(doc(db, 'follows', followId))
+      } else {
+        await setDoc(doc(db, 'follows', followId), {
+          followerId: currentUid,
+          followeeId: targetUid,
+          createdAt: serverTimestamp(),
+        })
+      }
+    } catch {
+      // Revert on failure
+      setIsFollowing(wasFollowing)
+      setFollowerCount((c) => c + (wasFollowing ? 1 : -1))
+    } finally {
+      setFollowBusy(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -80,8 +125,28 @@ export default function UserProfile() {
         <p className={styles.username}>@{profile.username}</p>
         {profile.bio ? <p className={styles.bio}>{profile.bio}</p> : null}
 
-        {isOwn && (
+        <div className={styles.statsRow}>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{followerCount}</span>
+            <span className={styles.statLabel}>follower{followerCount === 1 ? '' : 's'}</span>
+          </div>
+          <div className={styles.statDivider} />
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{followingCount}</span>
+            <span className={styles.statLabel}>following</span>
+          </div>
+        </div>
+
+        {isOwn ? (
           <Link to="/profile/edit" className={styles.editBtn}>Edit profile</Link>
+        ) : (
+          <button
+            className={`${styles.followBtn} ${isFollowing ? styles.followingBtn : ''}`}
+            onClick={toggleFollow}
+            disabled={followBusy}
+          >
+            {isFollowing ? 'Following' : 'Follow'}
+          </button>
         )}
       </div>
 
