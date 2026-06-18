@@ -438,14 +438,16 @@ export default function AlbumView() {
           <button className={styles.sheetBtn} onClick={() => { toggleLike(activePost); setActivePost(null) }}>
             {likedPostIds.has(activePost.id) ? 'Unlike photo' : 'Like photo'}
           </button>
-          {isCreator && (
+          {(isCreator || activePost.createdBy === user.uid) && (
             <button className={`${styles.sheetBtn} ${styles.sheetBtnDestructive}`} onClick={() => handleDeletePost(activePost)}>
-              Remove from album
+              {activePost.createdBy === user.uid && !isCreator ? 'Remove my photo' : 'Remove from album'}
             </button>
           )}
-          <button className={`${styles.sheetBtn} ${styles.sheetBtnDestructive}`} onClick={() => handleReportPost(activePost)}>
-            Report photo
-          </button>
+          {activePost.createdBy !== user.uid && (
+            <button className={`${styles.sheetBtn} ${styles.sheetBtnDestructive}`} onClick={() => handleReportPost(activePost)}>
+              Report photo
+            </button>
+          )}
         </BottomSheet>
       )}
 
