@@ -197,9 +197,17 @@ Upload helpers live in `src/lib/upload.js`: `uploadImage(file, path)`, `validate
 - Posts fetched with single `where('albumId')` filter, sorted client-side (no composite index)
 - Likes fetched by `userId` only, filtered client-side by `albumId`
 - All Firestore operations wrapped in try/catch with visible error state
+
+**Home (`src/pages/Home.jsx`):**
+- A single-column **network feed** — a merged, time-sorted timeline of updates from the people the current user follows. Three event types: `album` (a followed user created an album), `post` (a photo added to a followed user's album), `comment` (a comment on a followed user's album).
+- Fetch order: (1) `follows where followerId == me` → followee set; (2) `albums where createdBy in [followees]` → album events + the album-id set; (3) `posts`/`comments where albumId in [albumIds]`. Events are merged, sorted by `createdAt.seconds` desc, sliced to 40, then actor profiles are batch-fetched.
+- Firestore `in` accepts ≤ 10 values — the `chunk()` helper splits both the followee and album-id lists; empty lists short-circuit to an empty feed (the "follow people in Explore" empty state).
+- The current user's own posts/comments are filtered out (the feed is about others). Album events never carry a follow button (the creator is followed by definition); `post`/`comment` events show a **Follow** button on the poster/commenter only when not self and not already followed, using the same optimistic-toggle pattern as Explore's People tab.
 - Album `•••` menu: owner sees Edit/Delete; others see "Report album"
 
 **UserProfile (`src/pages/UserProfile.jsx`):** serves both `/profile` (own — no `:uid`, shows "Edit profile") and `/users/:uid` (others — shows Follow/Following toggle). Displays follower/following counts derived from the `follows` collection.
+
+**Home (`src/pages/Home.jsx`):** a follow-based activity feed ("Your feed"). Loads who the user follows, then their albums/posts/comments, merges them into one reverse-chronological timeline, and batch-fetches actor profiles. Firestore `in` queries are chunked to 10 values (`chunk()` helper). Empty state prompts the user to follow people via Explore.
 
 ---
 
