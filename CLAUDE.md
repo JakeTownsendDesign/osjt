@@ -46,15 +46,17 @@ Remote: `https://github.com/JakeTownsendDesign/osjt` (private). Branch: `main`.
 
 ### User context (`src/context/UserContext.jsx`)
 
-`UserProvider` wraps the entire app. It subscribes to `onAuthStateChanged` once and fetches `users/{uid}` from Firestore once per login. Exposes:
+`UserProvider` wraps the entire app. It subscribes to `onAuthStateChanged` once and then opens a **real-time `onSnapshot` listener** on `users/{uid}`. So the current user's profile (including the live daily-contribution counter) stays fresh everywhere with **no per-component reads**. Exposes:
 
 ```js
 const { user, profile, setProfile } = useUser()
 ```
 
 - `user` — Firebase `User` object (`undefined` = loading, `null` = logged out)
-- `profile` — Firestore `users/{uid}` doc data
-- `setProfile` — call after saving profile changes so consuming components update without a reload
+- `profile` — live Firestore `users/{uid}` doc data (snapshot-driven)
+- `setProfile` — optimistic local update; the snapshot is the source of truth and will self-correct
+
+Also exports helpers: `DAILY_CONTRIB_LIMIT` (3), `todayKey()` (YYYY-MM-DD), and `remainingContributions(profile)`.
 
 **Always read the current user's profile from this context.** Never fetch `users/{currentUid}` again inside a component — use `useUser()` instead.
 
@@ -66,7 +68,8 @@ const { user, profile, setProfile } = useUser()
 |---|---|---|
 | `/` | `Home` | `ProtectedRoute` |
 | `/explore` | `Explore` | `ProtectedRoute` |
-| `/profile` | `Profile` (own) | `ProtectedRoute` |
+| `/profile` | `UserProfile` (own, read-only + Edit button) | `ProtectedRoute` |
+| `/profile/edit` | `Profile` (edit form) | `ProtectedRoute` |
 | `/users/:uid` | `UserProfile` (public) | `ProtectedRoute` |
 | `/albums/:albumId` | `AlbumView` | `ProtectedRoute` |
 | `/create-album` | `CreateAlbum` | `ProtectedRoute` |
@@ -91,6 +94,8 @@ Guards consume `useUser()` — no props needed.
 
 Exports `auth`, `db`, `storage` — import from here everywhere, never re-initialise.
 
+Security rules live in the repo: `firestore.rules` and `storage.rules`, wired into `firebase.json`. Deploy with `npx firebase deploy --only firestore:rules,storage`. **Edit the repo files, not the console** — a console edit would be overwritten on the next deploy.
+
 ---
 
 ### Firestore data model
@@ -98,7 +103,8 @@ Exports `auth`, `db`, `storage` — import from here everywhere, never re-initia
 ```
 users/{uid}
   displayName, username, bio, avatarURL, avatarColor,
-  usernameChanged (bool), createdAt, updatedAt
+  usernameChanged (bool), createdAt, updatedAt,
+  dailyContrib { date: 'YYYY-MM-DD', count }   ← daily contribution counter
 
 usernames/{username}          ← reservation doc for uniqueness checks
   uid
@@ -106,7 +112,8 @@ usernames/{username}          ← reservation doc for uniqueness checks
 albums/{albumId}
   title, description, maxPhotos, photoCount, contributorCount,
   likeCount, commentCount, score, thumbnailColors (string[]),
-  status ('open' | 'complete'), createdBy (uid), createdAt, updatedAt
+  thumbnailURLs (string[], first 4 post images for card previews),
+  createdBy (uid), createdAt, updatedAt
 
 posts/{postId}
   albumId, createdBy (uid), imageURL, placeholderColor,
@@ -125,9 +132,11 @@ commentLikes/{commentId}__{uid}
 follows/{followerId}__{followeeId}
   followerId, followeeId, createdAt
 
-reports/{postId}__{uid}
-  postId, albumId, reportedBy, createdAt
+reports/{postId|album-albumId}__{uid}
+  postId?, albumId, reportedBy, type?, createdAt
 ```
+
+> **Note:** albums no longer use a `status` field. "Full" is derived live from `photoCount >= maxPhotos`, so removing a photo re-opens contributions automatically.
 
 **Username uniqueness:** enforced via the `usernames` collection (doc ID = lowercase username, value = `{ uid }`). Before writing a new username, read `usernames/{username}` and check ownership. Release the old reservation (`deleteDoc`) before writing the new one.
 
@@ -139,20 +148,39 @@ reports/{postId}__{uid}
 
 ### Storage
 
-Profile photos at `avatars/{uid}`. Storage rules must allow `write: if request.auth.uid == uid`.
+- Profile photos: `avatars/{uid}` — owner-only write.
+- Post photos: `posts/{albumId}/{postId}` — any signed-in user may write.
+
+Upload helpers live in `src/lib/upload.js`: `uploadImage(file, path)`, `validateImage(file)` (image type, ≤ 5 MB), and `nextDailyContrib(profile)` (computes the next counter value, handling the midnight rollover, with no DB read).
+
+---
+
+### Photo contributions & limits
+
+- **Daily limit:** a user may contribute **3 photos per day** to albums they don't own. The count lives on `users/{uid}.dailyContrib` and is read live from `UserContext`. Owners adding starter photos to their own album are exempt.
+- **Album capacity:** adding is blocked when `photoCount >= maxPhotos` ("Album full"); reversible — removing a photo re-opens it.
+- **Atomic write:** contributing writes the post + album counter update + user `dailyContrib` in **one `writeBatch`** so the security rules' `getAfter()` can verify the increment.
+- **Album creation:** owner adds 1–3 starter photos (min 1 required), uploaded in `CreateAlbum`.
+- **Removal:** a user can remove their own photos from any album; the album owner can remove any photo. Removal does **not** restore the daily slot.
+
+### Security rules (`firestore.rules`)
+
+- **`posts` create** is the key gate: requires `withinCapacity(albumId)` (album's `photoCount` after the write ≤ `maxPhotos`) AND either the album is owned by the user OR `withinDailyLimit()`. The latter uses `get()` + `getAfter()` to confirm the same write increments `dailyContrib` for **today** (date derived from `request.time`, so a tampered clock can't reset it) and stays ≤ 3.
+- **Field-level locks** via `changedKeys().hasOnly([...])`: non-owners may only change counter/engagement fields on `albums` (counts, thumbnails, updatedAt), `posts` (likeCount), and `comments` (likeCount).
+- **Deletes:** posts/comments deletable by their author or the album owner; albums by their owner.
 
 ---
 
 ### Layout system
 
-`AppLayout` wraps all authenticated pages (except `CreateAlbum`... actually `CreateAlbum` is also wrapped). It renders:
+`AppLayout` wraps every authenticated page. It renders:
 - `SideNav` — hidden mobile, icon-only 72px tablet (768px+), icon+label 220px desktop (1200px+)
-- `BottomNav` — mobile only, hidden at 768px+
-- `main` content area with left margin matching the sidebar width
+- `BottomNav` — mobile only, hidden at 768px+. The Profile tab shows the current user's avatar (from `useUser()`), not a generic icon.
+- `main` content area (full width minus the sidebar; no max-width cap)
 
-`CreateAlbum` and `AlbumView` are also wrapped with `AppLayout`.
+**AlbumView layout:** the comment section always stacks below the photo grid (single column at every breakpoint).
 
-**AlbumView layout:** on desktop (1200px+) uses a CSS grid — album content left, 380px sticky comment panel right. On mobile/tablet the comment section stacks below the grid.
+**AlbumView photo grid:** clicking a photo expands it to a 3×3 block via `grid-auto-flow: dense` + a unique `view-transition-name` per tile (uses the View Transitions API for smooth reflow; falls back to an instant swap in Firefox). Like/options + contributor details only appear on the expanded photo, overlaid on the image bottom.
 
 ---
 
@@ -169,6 +197,9 @@ Profile photos at `avatars/{uid}`. Storage rules must allow `write: if request.a
 - Posts fetched with single `where('albumId')` filter, sorted client-side (no composite index)
 - Likes fetched by `userId` only, filtered client-side by `albumId`
 - All Firestore operations wrapped in try/catch with visible error state
+- Album `•••` menu: owner sees Edit/Delete; others see "Report album"
+
+**UserProfile (`src/pages/UserProfile.jsx`):** serves both `/profile` (own — no `:uid`, shows "Edit profile") and `/users/:uid` (others — shows Follow/Following toggle). Displays follower/following counts derived from the `follows` collection.
 
 ---
 
@@ -192,10 +223,9 @@ Email changes use `verifyBeforeUpdateEmail` (not `updateEmail`) — the address 
 ### Dev seed
 
 Navigate to `/seed` while logged in to populate Firestore with:
-- 5 example users + username reservations
-- Current user's own profile doc
-- 3 albums (owned by current user, with `score` computed)
-- 9 posts per album (placeholder colours + captions)
-- 18 comments across albums (mix of top-level + replies, with `likeCount`)
+- 5 example users + username reservations, and the current user's own profile doc
+- 6 albums — 3 owned by the current user, 3 by seed users — each with `score`, `thumbnailURLs`, and real images (via Picsum, `picsum.photos/seed/{word}/600/600`)
+- 6–9 posts per album with real image URLs and captions
+- ~30 comments across albums (mix of top-level + replies, with `likeCount`)
 
 Runs pre-flight checks (project ID, Firestore read/write) before seeding. Re-running is safe — all writes use `setDoc` so existing docs are overwritten.

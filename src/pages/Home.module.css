@@ -1,7 +1,6 @@
 .screen {
   min-height: 100vh;
   background: #ffffff;
-  
 }
 
 .header {
@@ -31,6 +30,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* Section */
@@ -49,73 +56,128 @@
 .emptyText {
   font-size: 14px;
   color: #8a8a93;
+  line-height: 1.5;
 }
 
+.empty {
+  padding: 24px 0;
+}
+
+.emptyTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1b1b1f;
+  margin-bottom: 6px;
+}
+
+.exploreLink,
 .seedLink {
-  background: none;
-  border: none;
   color: #f6339a;
   font-size: 14px;
   font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  padding: 0;
+  text-decoration: none;
 }
 
-.albumList {
+/* ── Feed (single column) ─────────────────────────────────────────────────── */
+.feed {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-width: 560px;
+  padding-bottom: 32px;
 }
 
-/* Album card */
-.posterRow {
+.feedItem {
+  border: 1px solid #ececec;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.itemHeader {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 14px 10px;
-  text-decoration: none;
+  padding: 12px 14px;
   border-bottom: 1px solid #f5f5f5;
 }
 
-.posterAvatar {
-  width: 32px;
-  height: 32px;
+.actorLink {
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.actorAvatar {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: #ffffff;
-  flex-shrink: 0;
   overflow: hidden;
 }
 
-.posterAvatarImg {
+.actorAvatarImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.posterUsername {
-  font-size: 13px;
-  font-weight: 600;
-  color: #1b1b1f;
+.itemHeaderText {
   flex: 1;
+  min-width: 0;
 }
 
-.posterArrow {
-  font-size: 16px;
+.itemAction {
+  font-size: 13px;
+  color: #8a8a93;
+  line-height: 1.3;
+}
+
+.actorName {
+  font-weight: 700;
+  color: #1b1b1f;
+  text-decoration: none;
+}
+
+.actionVerb {
+  font-weight: 400;
+}
+
+.itemTime {
+  font-size: 12px;
   color: #b9b9c0;
 }
 
-.albumCard {
-  border: 1px solid #ececec;
-  border-radius: 18px;
-  overflow: hidden;
-  background: #ffffff;
+.followBtn {
+  flex-shrink: 0;
+  border: 1px solid #f6339a;
+  background: #f6339a;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.followBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ── Album body ───────────────────────────────────────────────────────────── */
+.albumBody,
+.postBody,
+.commentBody {
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }
 
 .thumbnailRow {
@@ -155,40 +217,49 @@
   margin-top: 4px;
 }
 
-.progressTrack {
-  margin-top: 14px;
-  height: 6px;
-  background: #ececec;
-  border-radius: 3px;
+/* ── Post body ────────────────────────────────────────────────────────────── */
+.postImageWrap {
+  position: relative;
+  width: 100%;
+  height: 280px;
   overflow: hidden;
 }
 
-.progressFill {
+.postImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
-  background: #f6339a;
-  border-radius: 3px;
-  transition: width 0.3s ease;
+  object-fit: cover;
+  display: block;
 }
 
-.albumMeta {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-}
-
-.metaBold {
-  font-size: 13px;
+.postCaption {
+  font-size: 14px;
   font-weight: 500;
   color: #1b1b1f;
+  line-height: 1.4;
 }
 
-.metaGray {
+.contextLine {
   font-size: 13px;
-  font-weight: 400;
   color: #8a8a93;
+  margin-top: 4px;
 }
 
-/* ── Responsive ─────────────────────────────────────────────────────────── */
+/* ── Comment body ─────────────────────────────────────────────────────────── */
+.commentBody {
+  padding: 14px 16px 16px;
+}
+
+.commentText {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1b1b1f;
+  line-height: 1.45;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
 @media (min-width: 768px) {
   .header {
     padding: 32px 32px 16px;
@@ -205,15 +276,4 @@
   .section {
     padding: 28px 48px 0;
   }
-  .albumList {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-}
-
-.thumbnailLink {
-  display: block;
-  text-decoration: none;
-  color: inherit;
 }
